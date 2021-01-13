@@ -1,0 +1,37 @@
+\chapter{Conclusion}
+\label{discussion}
+We designed a model of the Linux page cache and implemented it in the
+\simgrid-based \wrench simulation framework to simulate the execution
+of distributed applications.
+Evaluation results show that our model improves simulation accuracy
+substantially, reducing absolute relative simulation errors by up to
+9$\times$ (see results of the single-threaded experiment). The
+availability of asymmetrical disk bandwidths in the forthcoming
+\simgrid release will further improve these results.
+Our page cache model is publicly available in the \wrench GitHub
+repository.
+
+Page cache simulation can be instrumental in a number of studies. For
+instance, it is now common for HPC clusters to run applications in
+Linux control groups (cgroups), where resource consumption is limited,
+including memory and therefore page cache usage. Using our simulator,
+it would be possible to study the interaction between memory allocation
+and I/O performance, for instance to improve scheduling algorithms or
+avoid page cache starvation~\cite{zhuang2017}. Our simulator could also
+be leveraged to evaluate solutions that reduce the impact of network
+file transfers on distributed applications, such as burst
+buffers~\cite{ferreiradasilva-fgcs-bb-2019}, hierarchical file
+systems~\cite{islam2015triple}, active storage~\cite{5496981}, or
+specific hardware architectures~\cite{hayot2020performance}. 
+
+Not all I/O behaviors are captured by currently available simulation models,
+including the one developed in this work, 
+which could substantially limit the accuracy of simulations.
+Relevant extensions to this work include more
+accurate descriptions of anonymous memory usage in applications, 
+which strongly affects I/O times through writeback cache. File access patterns
+ might also be worth including in the simulation models,
+as they directly affect page cache content.
+% readahead and persistent storage could also be adeed
+% Simulation results could be made even more accurate by a deeper
+% investigation of page cache flushing and eviction order. 

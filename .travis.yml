@@ -1,0 +1,20 @@
+before_install:
+- sudo apt-get update && sudo apt-get install --no-install-recommends texlive-fonts-recommended
+  texlive-latex-extra texlive-fonts-extra texlive-latex-recommended dvipng
+script:
+- mkdir _build
+- pdflatex cuthesis
+- bibtex cuthesis
+- pdflatex cuthesis
+- pdflatex cuthesis
+- mv cuthesis.pdf _build/cuthesis.pdf
+deploy:
+  provider: releases
+  api_key:
+    secure: IJpsCWVEL6poaurxvN3j0wmNp0RPnQORxNT/gbuFYbmRmZosmhic6RQASR3g5OyVHNzv4OxTAIlpK0nYi/fJKzH4hVVuIS3OEQ9QHcQaiBSP9uoYKbrRKOH5fQzwVMcfE4A3NhY+thhxcY8HULQeClDxnyoJpYr+WvRFClfROW+0sNQ04uMGjJO+HxfTnx+ttNxYJ1tXnlTyrxEGTv1ZLlkgUPDnOJtkv5SctojvtRMuS1pu7zxrMD3cSBGo/2eVcLYuAEAQly7GIMO0OI+TIhl5UGW2uC0IZvuTvnlJz0XHjARHZfC6sfv48Uz2GJQ5ZlLR5trsLlnn1+L38d9m1L4Bt07fphqX85/xVp8nuO8xRRtqE/DPfSZdvfoZiAsz8wQZaJNX7BaUm35s8UtHZ7T1JT45xfs8EmucEQu2xfQ2j0J/+cM+DdwWgyFfbFEQBO2TF7V6m5hpX4BgZAiU+Wj/muGCSauMKBJm/WvDWvMmMJVWGhqqjdQd189E8CaVpkN+2mlYDiSHRIff24dqciJ7rVMd2zVtq70+v3+hjpPggJy9Rp8jvDTaGKatXZmiI4C4pi81aYyukXwXDpFdLVlIHIi26bLzSE9Ck2rxI0rDYkyN5ddqKEefqXpCgYktW21pkYIQkO1WVHRl3gt/nvSPU7Uxl5X3bMoZ79jU8Qo=
+  file: ./_build/cuthesis.pdf
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    repo: lalet/concordia-thesis-template

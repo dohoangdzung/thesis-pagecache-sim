@@ -1,3 +1,27 @@
 \begin{abstract}
-  Text of abstract.  
+The emergence of Big Data in recent years has resulted in a growing
+need for efficient data processing solutions. While infrastructures
+with sufficient compute power are available,
+the I/O bottleneck remains. The Linux page cache is an efficient
+approach to reduce I/O overheads, but few
+experimental studies of its interactions with Big Data applications exist,
+partly due to limitations of
+real-world experiments. Simulation is a popular approach to address
+these issues, however, existing simulation frameworks do not simulate
+page caching fully, or even at all.  As a result, simulation-based
+performance studies of data-intensive applications lead to inaccurate
+results.
+
+In this paper, we propose an I/O simulation model that includes
+the key features of the Linux page cache. We have implemented this model
+as part of the \wrench workflow simulation framework, which itself
+builds on the popular \simgrid distributed systems simulation
+framework. Our model and its implementation enable the simulation
+of both single-threaded and multithreaded applications, and of both
+writeback and writethrough caches for local or network-based
+filesystems. We evaluate the accuracy of our model in different
+conditions, including sequential and concurrent applications, as
+well as local and remote I/Os. We find that our page cache model
+reduces the simulation error by up to an order of magnitude when
+compared to state-of-the-art, cacheless simulations.
 \end{abstract}

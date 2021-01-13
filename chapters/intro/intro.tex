@@ -1,0 +1,66 @@
+\chapter{Introduction}
+
+The Linux page cache plays an important role in reducing filesystem data 
+transfer times. With the page cache, previously read data can be re-read 
+directly from memory, and written data can be written to memory before 
+being asynchronously flushed to disk, resulting in improved I/O performance
+on slower storage devices. The performance improvements depend on many 
+factors including the total amount of memory, the amount of data being 
+written (i.e., dirty data), and the amount of memory available for
+written data. All these factors are important when determining the impact 
+of I/O on application performance, particularly in data-intensive applications.
+
+% Swapped the order the two paragraphs and merged them into one
+The number of data-intensive applications has been steadily rising as a result of
+open-data and data sharing initiatives. Due to the sheer size of the data being
+processed, these applications must be executed on large-scale infrastructures
+such as High Performance Computing (HPC) clusters or the cloud.  
+It is thus crucial to quantify the performance of these applications
+on these platforms. The goals include determining which type of hardware/software
+stacks are best suited to different application classes, as well asunderstanding 
+the limitations of current algorithms, designs and technologies. 
+Unfortunately, performance studies relying on real-world experiments on 
+compute platforms face several difficulties (high operational costs, 
+labor-intensive experimental setups, shared platforms with dynamic loads 
+that hinder reproducibility of results) and shortcomings
+(experiments are limited to the available platform/software configurations, 
+which precludesthe exploration of hypothetical scenarios). 
+Simulations address these concerns by providing models and abstractions 
+for the performance of computer hardware, such as CPU, network and storage. 
+As a result, simulations provide a cost-effective, fast, easy and reproducible 
+way to evaluate application performance on arbitrary platform configurations. 
+It thus comes as no surprise that a large number of simulation frameworks 
+have been developed and used for research and development
+~\cite{ optorsim, gridsim, groudsim, cloudsim, nunez2012simcan,
+nunez2012icancloud, mdcsim, dissect_cf, cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}. 
+
+Page caching is an ubiquitous technique for mitigating the I/O bottleneck.
+As such, it is necessary to model it
+when simulating data-intensive applications.
+While existing simulation frameworks of parallel and distributed computing
+systems  capture many relevant features of hardware/software stacks, 
+they lack the ability to simulate page cache with enough details to capture key features such
+as dirty data and cache eviction policies~\cite{nunez2012simcan,nunez2012icancloud}. 
+Some simulators, such as the one in~\cite{xu2018saving}, do capture such features,
+but are domain-specific. 
+
+%However, there is a trade-off between accuracy and scalability, which has been
+%indicated in some reviews \cite{casanova2014simgrid} \cite{byrne2017review}.
+%This means that in most cicumstances, users have to, more or less, sacrifice
+%accuracy for the scalability and performance when their platforms grow to
+%hundreds or thousands nodes.
+
+In this work, we present \wrench-cache, a page cache simulation model
+implemented in \wrench~\cite{casanova2020fgcs}, a workflow simulation
+framework based on the popular \simgrid distributed simulation
+toolkit~\cite{casanova2014simgrid}. Our contributions are:
+
+\begin{compactitem}
+    \item A page cache simulation model that supports 
+both single-threaded and multithreaded applications, and both
+writeback and writethrough caches for local or network-based
+filesystems;
+    \item An implementation of this model in \wrench; 
+    \item An evaluation of the accuracy and scalability of our model, and of its implementation,
+          for multiple applications, execution scenarios, and page cache configurations. 
+\end{compactitem}

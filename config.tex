@@ -7,46 +7,32 @@
 % Make hyperref colors nicer
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=black,filecolor=black,urlcolor=blue}
 % Some example common packages used in computer science thesis
-%\usepackage{cite}
-%\usepackage{amssymb}
-%\usepackage{mathtools}
-% \usepackage{graphicx}
-% \usepackage{natbib}
-% \usepackage{amsmath}
-% \usepackage{amsfonts}
-% \usepackage{amssymb}
-% \usepackage{algpseudocode}
-% \usepackage{algorithm}
-% \usepackage{algorithmicx}
-% \usepackage[hidelinks]{hyperref}
-%\usepackage{bibtex}
-
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{ulem}
+\usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 								%% Global constants %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Some example constants that might be helpful in future
 
-% \newtheorem{definition}{Definition }
-% \newtheorem{theorem}{Theorem}[section]
-% \newtheorem{lemma}[theorem]{Lemma}
-% \newtheorem{proposition}[theorem]{Proposition}
-% \newtheorem{corollary}[theorem]{Corollary}
+\algblock{Input}{EndInput}
+\algnotext{EndInput}
+\algblock{Output}{EndOutput}
+\algnotext{EndOutput}
 
-% \newenvironment{proof}[1][Proof]{\begin{trivlist}
-% 		\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-
-% \newenvironment{example}[1][Example]{\begin{trivlist}
-% 		\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-
-% \newenvironment{remark}[1][Remark]{\begin{trivlist}
-% 		\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-
-% \newcommand{\qed}{\nobreak \ifvmode \relax \else
-% 	\ifdim\lastskip<1.5em \hskip-\lastskip
-% 	\hskip1.5em plus0em minus0.5em \fi \nobreak
-% 	\vrule height0.5em width0.5em depth0.25em\fi}
-
-% \newcommand{\heading}[1]{\paragraph{#1}\mbox{}\\}
-
-% \newcommand*{\thead}[1]{\multicolumn{1}{|c|}{\bfseries #1}}
+\newcommand{\Desc}[2]{\State \makebox[2em][l]{#1}#2}
+\newcommand{\simgrid}{SimGrid\xspace}
+\newcommand{\wrench}{WRENCH\xspace}
