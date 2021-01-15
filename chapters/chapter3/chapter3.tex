@@ -1,5 +1,6 @@
 \chapter{Methods}
 \label{method}
+
 We separate our simulation model in two components, the I/O
 Controller and the Memory Manager, which together simulate
 file reads and writes (Figure~\ref{fig:interaction}).
@@ -14,8 +15,8 @@ cache is flushed if needed and written data is added to page cache.
 
 \begin{figure}
        \centering
-       \includegraphics[width=0.85\columnwidth]{figures/interaction.pdf}
-       \caption{Overview of the page cache simulator.
+       \includegraphics[width=0.8\columnwidth]{figures/interaction.pdf}
+       \captionof{figure}{Overview of the page cache simulator.
        Applications send file read or write requests to the
        I/O Controller that orchestrates flushing, eviction, cache
        and disk accesses with the Memory Manager. Concurrent accesses to storage
@@ -23,8 +24,8 @@ cache is flushed if needed and written data is added to page cache.
        \label{fig:interaction}
 \end{figure}
 
-\input{chapters/method/subsec1}
-\input{chapters/method/subsec2}
-\input{chapters/method/subsec3}
-\input{chapters/method/subsec4}
+\input{chapters/chapter3/subsec1}
+\input{chapters/chapter3/subsec2}
+\input{chapters/chapter3/subsec3}
+\input{chapters/chapter3/subsec4}
 

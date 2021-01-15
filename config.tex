@@ -4,9 +4,6 @@
 
 \usepackage{cuthesis}
 \usepackage{hyperref}
-% Make hyperref colors nicer
-\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,filecolor=black,urlcolor=blue}
-% Some example common packages used in computer science thesis
 \usepackage{graphicx}
 \usepackage{paralist}
 \usepackage{algorithm}
@@ -14,7 +11,6 @@
 \usepackage{algpseudocode}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{amsmath}
-\usepackage{hyperref}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{ulem}
@@ -22,6 +18,8 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{float}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,filecolor=black,urlcolor=blue}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 								%% Global constants %%
@@ -32,7 +30,6 @@
 \algnotext{EndInput}
 \algblock{Output}{EndOutput}
 \algnotext{EndOutput}
-
 \newcommand{\Desc}[2]{\State \makebox[2em][l]{#1}#2}
 \newcommand{\simgrid}{SimGrid\xspace}
 \newcommand{\wrench}{WRENCH\xspace}

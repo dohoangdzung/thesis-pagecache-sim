@@ -23,9 +23,10 @@ or dirty (1), and an entry (creation) time.
 Blocks can have different sizes and a given file can have multiple
 data blocks in page cache. In addition, a data block can be split into an
 arbitrary number of smaller blocks.
+
 \begin{figure}
        \centering
-       \includegraphics[width=\columnwidth]{figures/lru_lists.pdf}
+       \includegraphics[width=0.8\columnwidth]{figures/lru_lists.pdf}
        \caption{Model of page cache LRU lists with data blocks.}
        \label{fig:lrulist}
 \end{figure}
@@ -64,9 +65,10 @@ In this case, the block is split in two smaller blocks and one of them is re-acc
 % From Tristan: not sure where to put this nor if it's necessary:
 % , in which chunks are read/written
 % until file is entirely read/written.
+
 \begin{figure}
        \centering
-       \includegraphics[width=\columnwidth]{figures/read_order.pdf}
+       \includegraphics[width=0.8\columnwidth]{figures/read_order.pdf}
        \caption{File data read order. Data is read from left to right: uncached data
        is read first, followed by data from the inactive list, and finally data from the active list. }
        \label{fig:read_order}
@@ -101,7 +103,8 @@ and only one of them is evicted.
 The overhead of the cache eviction algorithm is not part of the simulated time
 since cache eviction time is negligible in real systems. % \tristan{a reference would be welcome}.
 
-\begin{algorithm}[b]\caption{Periodical flush simulation in Memory Manager}
+\begin{algorithm}[H]
+\caption{Periodical flush simulation in Memory Manager}
 \label{alg:pdflush}
     \small
     \begin{algorithmic}[1]

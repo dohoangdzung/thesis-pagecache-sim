@@ -1,6 +1,8 @@
 \chapter{Results}
 \label{results}
 
+\section{Single-threaded execution (Exp 1)}
+
 \begin{figure*}
     \centering
     \begin{subfigure}{\linewidth}
@@ -23,15 +25,13 @@
     \end{subfigure}
     \begin{subfigure}{\linewidth}
         \centering
-           \includegraphics[width=1.05\linewidth]{result/single/figures/cached_files.pdf}
+           \includegraphics[width=\linewidth]{result/single/figures/cached_files.pdf}
            \caption{Cache contents \emph{after} application I/O operations}
         %    \textcolor{red}{Update real results of 20GB}}
            \label{fig:single_cache}
     \end{subfigure}
     \caption{Single-threaded results (\textit{Exp 1})}
 \end{figure*}
-
-\section{Single-threaded execution (Exp 1)}
 
 The page cache simulation model drastically reduced I/O simulation
 errors in each application task (Figure~\ref{fig:single_error}). The first read was not impacted
@@ -151,6 +151,7 @@ very accurately simulated by both WRENCH and WRENCH-cache.
 \end{figure}
 
 \section{Simulation time}
+
 As is the case for \wrench, simulation time with \wrench-cache scales
 linearly with the number of concurrent applications
 (Figure~\ref{fig:multi_time}, p \textless $10^{-24}$). However, the page

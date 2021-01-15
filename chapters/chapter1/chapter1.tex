@@ -1,4 +1,5 @@
 \chapter{Introduction}
+\label{introduction}
 
 The Linux page cache plays an important role in reducing filesystem data 
 transfer times. With the page cache, previously read data can be re-read 
@@ -55,7 +56,7 @@ implemented in \wrench~\cite{casanova2020fgcs}, a workflow simulation
 framework based on the popular \simgrid distributed simulation
 toolkit~\cite{casanova2014simgrid}. Our contributions are:
 
-\begin{compactitem}
+\begin{itemize}
     \item A page cache simulation model that supports 
 both single-threaded and multithreaded applications, and both
 writeback and writethrough caches for local or network-based
@@ -63,4 +64,4 @@ filesystems;
     \item An implementation of this model in \wrench; 
     \item An evaluation of the accuracy and scalability of our model, and of its implementation,
           for multiple applications, execution scenarios, and page cache configurations. 
-\end{compactitem}
+\end{itemize}
