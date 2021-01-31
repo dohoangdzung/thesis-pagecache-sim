@@ -1,18 +1,24 @@
 \begin{abstract}
-The emergence of Big Data in recent years has resulted in a growing
-need for efficient data processing solutions. While infrastructures
-with sufficient compute power are available,
-the I/O bottleneck remains. The Linux page cache is an efficient
-approach to reduce I/O overheads, but few
-experimental studies of its interactions with Big Data applications exist,
-partly due to limitations of
-real-world experiments. Simulation is a popular approach to address
-these issues, however, existing simulation frameworks do not simulate
-page caching fully, or even at all.  As a result, simulation-based
-performance studies of data-intensive applications lead to inaccurate
-results.
 
-In this paper, we propose an I/O simulation model that includes
+The emergence of Big Data in various fields in recent years has led to a 
+growing need in data processing and an increasing number of 
+data-intensive applications.
+These massive amount of data and applications must be executed on large-scale 
+infrastructures such as cloud or High Performance Computing (HPC) clusters.
+However, some relevant challenges remain in resource management , performance, 
+scheduling, scalability, etc. 
+As a results, there is an increasing demand for performance optimization solutions, 
+including data processing. 
+While infrastructures with sufficient compute power and storage capacity are available, 
+the I/O performance on disks remains as a bottleneck. 
+Apart from hardware improvements, the Linux page cache is an efficient approach 
+to reduce I/O overheads, but few experimental studies of its interactions with Big Data applications exist, 
+partly due to limitations of real-world experiments. 
+Simulation is a popular approach to address these issues, however, existing simulation frameworks do not simulate page caching fully, or even at all.  
+As a result, simulation-based performance studies of data-intensive applications 
+lead to inaccurate results.
+
+This thesis proposes an I/O simulation model that includes
 the key features of the Linux page cache. We have implemented this model
 as part of the \wrench workflow simulation framework, which itself
 builds on the popular \simgrid distributed systems simulation
