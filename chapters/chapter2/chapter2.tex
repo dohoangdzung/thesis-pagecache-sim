@@ -3,26 +3,92 @@
 
 \section{Page cache}
 
- %To improve performance of disk accesses, the page cache was introduced to the Linux kernel. %It contains pages referring to physical pages on disk \cite{linuxdev3rd2010}
-Page cache offsets the cost of disk I/O by enabling I/O to occur directly from memory.
-When a file is first loaded into memory, the file is read from disk and loaded into the page cache as
-a series of pages. Subsequent reads to any of the file pages located in memory will result in
-a \textit{cache hit}, meaning the I/O can occur directly from without disk involvement.
-Any accessed page not loaded in memory results in a \textit{cache miss}, resulting in
-the page being read directly from disk.
+\subsection{Page reduces I/O cost}
 
-Written pages can also contribute to future application cache hits. When use of page cache
-is enabled for a given filesystem, through the enabling of writeback or writethrough cache,
-all written pages are written first to page cache, prior to being written to disk.
-Accessing of these written pages may result in cache hits, should the pages remain in memory.
+\subsubsection{The Linux page cache}
 
-The kernel may also provide improved write performance if writeback cache is enabled. Unlike writethrough,
-where the data is synchronously written from memory to disk, writeback enables asynchronous writes.
-With writeback, the application may proceed with execution once the data has been
-written to memory, even if it has not yet been materialized to disk.  
+To offsets the cost of disk I/O, the Linux kernel implements a disk cache, 
+called \textit{page cache}, by storing in memory data that requires disk accesses. 
+There are two reasons that make the disk caches important to operating systems. 
+First, disk accesses are several orders of magnitude slower than memory accesses. 
+Second, there is a likelihood data accessed before will be accessed again 
+in near future \cite{linuxdev3rd2010}. 
+With memory bandwidth, which is much faster than disk bandwidth, combined with 
+the situations that data can be accessed in memory instead of on disk, the I/O 
+performance can be largely improved. 
+In Linux, the page cache is a part of RAM, which includes physical pages referring 
+to pages on disk. 
+The size of the page cache is dynamic when it can grow when there is enough 
+free memory, and can be shrink to release memory if needed. 
+
+When the kernel starts a read operation, it checks if the required data is in memory. 
+If yes, called a \textit{cache hit}, data is then read directly from memory, 
+with memory bandwidth, instead of from disk. 
+If not, called a \textit{cache miss}, data is read from disk and the kernel 
+places a new entry representing this data in the page cache for later reads 
+\cite{linuxdev3rd2010}. 
+Data cached in the the page cache is pages, which means files must not be 
+cached entirely, the page cache can keep the whole file, or only part a file. 
+
+\subsubsection{Writeback and writethrough page cache}
+
+When use of page cache is enabled for a given filesystem, all written pages 
+are written first to page cache, prior to being written to disk.
+Accessing of these written pages may result in cache hits, should the pages 
+remain in memory.
+Generally speaking, the page cache can implement one in three 
+different write strategies.
+In the first strategy, which is \textit{no-write}, the page cache simply does not 
+involve in write operations. In \textit{no-write}, data is written directly to disk, 
+the cache is invalidated and read from disk for any subsequent requests. 
+This strategy is rarely implemented since it not only fails to cache data, 
+but also costly invalidates the page cache \cite{linuxdev3rd2010}.
+The second strategy is \textit{writethrough}, in which the kernel updates both 
+disk and memory cache in write operations. The name \textit{writethrough} 
+itself suggests that data is written \textit{through} the page cache to disk with 
+disk write bandwidth \cite{linuxdev3rd2010}.
+This is a simple solution that can keep data in cache, synchronized between 
+page cache and disk, but it does not make the write operations benefit from 
+fast memory write bandwidth. 
+The third strategy is the approach implemented in Linux kernel, 
+called \textit{writeback}. 
+With writeback cache, the kernel perform write operations by writing data directly 
+into the page cache. However, unlike writethrough, the storage is not immediately 
+updated. Instead, the pages that have been written to page cache are marked 
+as \textit{dirty} data. These dirty pages are periodically written back to disk by 
+a flusher process in predefined intervals. 
+In addition, if the kernel needs to reclaim some free memory, it can immediately 
+trigger data flushing to write back dirty data to disk. 
+After being written back to backing store, these pages are no longer dirty and 
+can be removed from page cache when the free memory is insufficient.
 The writeback strategy is considered to outperform writethrough as well as
-direct I/O (page cache bypassed for I/O) as it delays disk writes to perform a bulk write at a later time
-\cite{linuxdev3rd2010}.
+direct I/O (page cache bypassed for I/O) as it delays disk writes to perform 
+a bulk write at a later time \cite{linuxdev3rd2010}.
+
+\subsubsection{Caching on NFS}
+
+Data caching requires keeping data close to where it is requested. 
+In network filesystem (NFS), data caching means not sending requests 
+to server over the network. Thus, data is cached on NFS client cache instead 
+of a remote disk \cite{eisler2001managing}. 
+In addition, some cache schemes are restricted to ensure data integrity and 
+consistency depending on the structure of the filesystem.
+In reading on NFS, if data is cached on client, data is read from client cache 
+as with local filesystem. If required data is not cached on the client, it will be read 
+from server. On server side, the kernel also checks for the availability of data in 
+server cache to decide whether data is read from cache or disk. 
+However, there is no server cache in writing since the data written to NFS server 
+cannot be cached and must be written to disk before the write call on the 
+NFS client finishes to ensure data integrity. 
+If server cache is enable for writing, if the server crashes during a cache write 
+could result in a problem since the client could not be aware of if data has 
+been written successfully. 
+On the other hand, given a scenario where multiple write operations queue up 
+on client side, a client failure before data is written could leave the NFS server 
+with an old version of file begin written. 
+Thus, only writethrough strategy can be implemented for writing on NFS. 
+
+\subsection{Cache eviction}
 
 Cache eviction and flushing strategies are integral to proper page cache functioning.
 Whenever space in memory becomes limited, either as a result of application memory
@@ -38,6 +104,12 @@ page cache longer than an expiration time configured in the kernel.
 Different cache eviction algorithms have also been proposed
 \cite{owda2014comparison}.
 
+\subsection{Flushing and periodical flushing}
+
+\subsection{Page cache LRU lists}
+
+\section{Simulation vs experimentation}
+
 The Linux kernel uses a two-list strategy to flag pages for eviction.
 The two-list strategy is based on a least recently used (LRU) policy
 and uses an active and inactive list in its implementation.
@@ -52,7 +124,9 @@ or pages that have been accessed more than once but moved from the active list.
 Both lists operate using LRU eviction policies, meaning that data that has
 not be accessed recently will be moved first.
 
-\section{Simulation}
+\section{Simulation frameworks}
+
+\subsection{Models and concerns}
 
 Many simulation frameworks have been developed to enable the
 simulation of parallel and distributed
@@ -98,6 +172,8 @@ builds on top of \simgrid to provide higher-level simulation
 abstractions, so that simulators of complex applications and
 systems can be implemented with a few hundred lines.
 
+\subsection{Existing data caching simulation}
+
 Although the Linux page cache has a large impact on I/O
 performance, and thus on the execution of data-intensive
 applications, its simulation is rarely considered in the above
@@ -120,3 +196,5 @@ In this study, we implement a page cache simulation model in the
 actively developed framework that provides convenient simulation
 abstractions, because it is extensible, and because it reuses
 \simgrid's scalable and accurate models.
+
+\subsection{SimGrid and WRENCH}
