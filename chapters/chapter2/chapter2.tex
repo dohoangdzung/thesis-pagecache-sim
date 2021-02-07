@@ -3,7 +3,7 @@
 
 \section{Page cache}
 
-\subsection{Page reduces I/O cost}
+\subsection{Page cache reduces I/O cost}
 
 \subsubsection{The Linux page cache}
 
@@ -38,11 +38,13 @@ Accessing of these written pages may result in cache hits, should the pages
 remain in memory.
 Generally speaking, the page cache can implement one in three 
 different write strategies.
+
 In the first strategy, which is \textit{no-write}, the page cache simply does not 
 involve in write operations. In \textit{no-write}, data is written directly to disk, 
 the cache is invalidated and read from disk for any subsequent requests. 
 This strategy is rarely implemented since it not only fails to cache data, 
 but also costly invalidates the page cache \cite{linuxdev3rd2010}.
+
 The second strategy is \textit{writethrough}, in which the kernel updates both 
 disk and memory cache in write operations. The name \textit{writethrough} 
 itself suggests that data is written \textit{through} the page cache to disk with 
@@ -50,6 +52,7 @@ disk write bandwidth \cite{linuxdev3rd2010}.
 This is a simple solution that can keep data in cache, synchronized between 
 page cache and disk, but it does not make the write operations benefit from 
 fast memory write bandwidth. 
+
 The third strategy is the approach implemented in Linux kernel, 
 called \textit{writeback}. 
 With writeback cache, the kernel perform write operations by writing data directly 
@@ -90,21 +93,32 @@ Thus, only writethrough strategy can be implemented for writing on NFS.
 
 \subsection{Cache eviction}
 
-Cache eviction and flushing strategies are integral to proper page cache functioning.
-Whenever space in memory becomes limited, either as a result of application memory
-or page cache use, page cache data may be evicted. Only data that
-has been persisted to storage (clean pages) can be flagged for eviction and removed from
-memory. Written data that has not yet been persisted to disk (dirty data) must first
-be copied (flushed) to storage prior to eviction. When sufficient memory is
-being occupied, the flushing process is synchronous. However, even when
-there is sufficient available memory, written data will be flushed to disk
-at a predefined interval through a process known as \textit{periodical flushing}.
+Cache eviction mechanism is one of the key features in the operations of page cache. 
+It is responsible for deciding removing pages from the page cache to make 
+memory space available for new entries as well as free RAM for other uses. 
+Whenever space in memory becomes limited, either as a result of application 
+memory or page cache use, page cache data may be evicted. 
+Only clean data, which is not marked as dirty and persisted to storage, can be 
+flagged for eviction and removed from memory. 
+If clean pages are insufficient, written data that has not yet been persisted to 
+disk (dirty data) must first be copied (flushed) to storage and marked as clean 
+to make more pages available for eviction \cite{linuxdev3rd2010}. The crucial 
+part in the cache eviction mechanism is to decide which pages to evict. 
+According to the idea of the page cache, data that is more likely to be accessed 
+in the future should be kept in page cache, and the data that is least likely to 
+be used should be evicted. 
+
+\subsection{Flushing and periodical flushing}
+
+Beside cache eviction, flushing strategies are integral to proper page cache functioning.
+When sufficient memory is being occupied, the flushing process is synchronous. 
+However, even when there is sufficient available memory, written data will be 
+flushed to disk at a predefined interval through a process known as 
+\textit{periodical flushing}.
 Periodical flushing only flushes expired dirty pages, which remain dirty in
 page cache longer than an expiration time configured in the kernel.
 Different cache eviction algorithms have also been proposed
 \cite{owda2014comparison}.
-
-\subsection{Flushing and periodical flushing}
 
 \subsection{Page cache LRU lists}
 
