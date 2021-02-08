@@ -8,22 +8,25 @@
 \subsubsection{The Linux page cache}
 
 To offsets the cost of disk I/O, the Linux kernel implements a disk cache, 
-called \textit{page cache}, by storing in memory data that requires disk accesses. 
-There are two reasons that make the disk caches important to operating systems. 
-First, disk accesses are several orders of magnitude slower than memory accesses. 
+called \textit{page cache}, by storing in memory data that requires 
+disk accesses. 
+There are two reasons that make the disk caches important to 
+operating systems. 
+First, disk accesses are several orders of magnitude slower than 
+memory accesses. 
 Second, there is a likelihood data accessed before will be accessed again 
 in near future \cite{linuxdev3rd2010}. 
-With memory bandwidth, which is much faster than disk bandwidth, combined with 
-the situations that data can be accessed in memory instead of on disk, the I/O 
-performance can be largely improved. 
-In Linux, the page cache is a part of RAM, which includes physical pages referring 
-to pages on disk. 
-The size of the page cache is dynamic when it can grow when there is enough 
-free memory, and can be shrink to release memory if needed. 
+With memory bandwidth, which is much faster than disk bandwidth, 
+combined with the situations that data can be accessed in memory instead 
+of on disk, the I/O performance can be largely improved. 
+In Linux, the page cache is a part of RAM, which includes physical pages 
+referring to pages on disk. 
+The size of the page cache is dynamic when it can grow when there is 
+enough free memory, and can be shrink to release memory if needed. 
 
-When the kernel starts a read operation, it checks if the required data is in memory. 
-If yes, called a \textit{cache hit}, data is then read directly from memory, 
-with memory bandwidth, instead of from disk. 
+When the kernel starts a read operation, it checks if the required data is 
+in memory. If yes, called a \textit{cache hit}, data is then read directly 
+from memory, with memory bandwidth, instead of from disk. 
 If not, called a \textit{cache miss}, data is read from disk and the kernel 
 places a new entry representing this data in the page cache for later reads 
 \cite{linuxdev3rd2010}. 
@@ -39,31 +42,32 @@ remain in memory.
 Generally speaking, the page cache can implement one in three 
 different write strategies.
 
-In the first strategy, which is \textit{no-write}, the page cache simply does not 
-involve in write operations. In \textit{no-write}, data is written directly to disk, 
-the cache is invalidated and read from disk for any subsequent requests. 
+In the first strategy, which is \textit{no-write}, the page cache simply 
+does not involve in write operations. In \textit{no-write}, data is written 
+directly to disk, the cache is invalidated and read from disk for any 
+subsequent requests. 
 This strategy is rarely implemented since it not only fails to cache data, 
 but also costly invalidates the page cache \cite{linuxdev3rd2010}.
 
 The second strategy is \textit{writethrough}, in which the kernel updates both 
 disk and memory cache in write operations. The name \textit{writethrough} 
-itself suggests that data is written \textit{through} the page cache to disk with 
-disk write bandwidth \cite{linuxdev3rd2010}.
-This is a simple solution that can keep data in cache, synchronized between 
-page cache and disk, but it does not make the write operations benefit from 
-fast memory write bandwidth. 
+itself suggests that data is written \textit{through} the page cache to disk 
+with disk write bandwidth \cite{linuxdev3rd2010}.
+This is a simple solution that can keep data in cache, synchronized 
+between page cache and disk, but it does not make the write operations 
+benefit from fast memory write bandwidth. 
 
 The third strategy is the approach implemented in Linux kernel, 
 called \textit{writeback}. 
-With writeback cache, the kernel perform write operations by writing data directly 
-into the page cache. However, unlike writethrough, the storage is not immediately 
-updated. Instead, the pages that have been written to page cache are marked 
-as \textit{dirty} data. These dirty pages are periodically written back to disk by 
-a flusher process in predefined intervals. 
-In addition, if the kernel needs to reclaim some free memory, it can immediately 
-trigger data flushing to write back dirty data to disk. 
-After being written back to backing store, these pages are no longer dirty and 
-can be removed from page cache when the free memory is insufficient.
+With writeback cache, the kernel perform write operations by writing data 
+directly into the page cache. However, unlike writethrough, the storage is not 
+immediately updated. Instead, the pages that have been written to page cache 
+are marked as \textit{dirty} data. These dirty pages are periodically written 
+back to disk by a flusher process in predefined intervals. 
+In addition, if the kernel needs to reclaim some free memory, it can 
+immediately trigger data flushing to write back dirty data to disk. 
+After being written back to backing store, these pages are no longer dirty 
+and can be removed from page cache when the free memory is insufficient.
 The writeback strategy is considered to outperform writethrough as well as
 direct I/O (page cache bypassed for I/O) as it delays disk writes to perform 
 a bulk write at a later time \cite{linuxdev3rd2010}.
@@ -77,66 +81,200 @@ of a remote disk \cite{eisler2001managing}.
 In addition, some cache schemes are restricted to ensure data integrity and 
 consistency depending on the structure of the filesystem.
 In reading on NFS, if data is cached on client, data is read from client cache 
-as with local filesystem. If required data is not cached on the client, it will be read 
-from server. On server side, the kernel also checks for the availability of data in 
-server cache to decide whether data is read from cache or disk. 
-However, there is no server cache in writing since the data written to NFS server 
-cannot be cached and must be written to disk before the write call on the 
-NFS client finishes to ensure data integrity. 
-If server cache is enable for writing, if the server crashes during a cache write 
-could result in a problem since the client could not be aware of if data has 
-been written successfully. 
-On the other hand, given a scenario where multiple write operations queue up 
-on client side, a client failure before data is written could leave the NFS server 
-with an old version of file begin written. 
+as with local filesystem. If required data is not cached on the client, 
+it will be read from server. On server side, the kernel also checks for the 
+availability of data in server cache to decide whether data is read from 
+cache or disk. 
+However, there is no server cache in writing since the data written to 
+NFS server cannot be cached and must be written to disk before the write 
+call on the NFS client finishes to ensure data integrity. 
+If server cache is enable for writing, if the server crashes during a cache 
+write could result in a problem since the client could not be aware of if 
+data has been written successfully. 
+On the other hand, given a scenario where multiple write operations 
+queue up on client side, a client failure before data is written could leave 
+the NFS server with an old version of file begin written. 
 Thus, only writethrough strategy can be implemented for writing on NFS. 
 
 \subsection{Cache eviction}
 
-Cache eviction mechanism is one of the key features in the operations of page cache. 
+Cache eviction mechanism is one of the key features in the operations of 
+page cache. 
 It is responsible for deciding removing pages from the page cache to make 
 memory space available for new entries as well as free RAM for other uses. 
 Whenever space in memory becomes limited, either as a result of application 
 memory or page cache use, page cache data may be evicted. 
 Only clean data, which is not marked as dirty and persisted to storage, can be 
 flagged for eviction and removed from memory. 
-If clean pages are insufficient, written data that has not yet been persisted to 
-disk (dirty data) must first be copied (flushed) to storage and marked as clean 
-to make more pages available for eviction \cite{linuxdev3rd2010}. The crucial 
-part in the cache eviction mechanism is to decide which pages to evict. 
-According to the idea of the page cache, data that is more likely to be accessed 
-in the future should be kept in page cache, and the data that is least likely to 
-be used should be evicted. 
+If clean pages are insufficient, written data that has not yet been persisted 
+to disk (dirty data) must first be copied (flushed) to storage and marked as 
+clean to make more pages available for eviction 
+\cite{linuxdev3rd2010,bovet2005understanding}. 
+The crucial part in the cache eviction mechanism is to decide which pages 
+to evict. According to the idea of the page cache, data that is more likely 
+to be accessed in the future should be kept in page cache, and the data 
+that is least likely to be used should be evicted. 
+Different cache eviction algorithms have also been proposed
+\cite{chavan2011comparison}.
+
+\subsubsection{Page cache replacement policies}
+
+We have mentioned about the page cache, adding pages to the page cache, 
+cache eviction. But how the page cache is exactly structured, how data is 
+placed and removed from the page cache?
+
+The idea of the page cache is to keep data that is likely to be accessed again 
+in the future, but an algorithm that knows the future in advance, often 
+referred as \textit{clairvoyant algorithm}, is impossible to implement. 
+Many algorithms have been designed and proposed to approximate the 
+\textit{clairvoyant algorithm}. 
+
+One of the most commonly used strategy is \textit{Least Recently Used (LRU)}. 
+This page replacement policy is based on the principle of locality that 
+data references of a process tend to cluster. Thus, it selects pages that 
+has not been referred for a longest time to remove 
+\cite{chavan2011comparison}.However, one of the drawbacks of LRU 
+is not considering data access frequency.
+
+The \textit{CLOCK} algorithm improves this shortcoming of LRU by 
+structuring the page cache as a circular list with a hand pointing to 
+the tail of the list.
+Each page has an reference bit, which is turned on if the page is referenced. 
+Only the oldest pages with the reference bit set to zero can be removed 
+\cite{chavan2011comparison}. 
+This algorithm is improved with \textit{Dueling CLOCK}, which uses 
+interchangeably and adaptively two variants of CLOCK for better 
+performance than LRU and CLOCK \cite{chavan2011comparison}.
+
+Another variant of LRU is \textit{LRU-K}, which takes page frequency 
+information  into account while replacing pages. It looks backward on the 
+LRU list for the \textit{k\textsuperscript{th}} most recent reference of 
+a candidate page and replace the page with the oldest 
+\textit{k\textsuperscript{th}} reference. 
+Experimental results indicate that LRU-2 can increase performance 
+compared to LRU \cite{chavan2011comparison}. 
+
+\textit{Low Inter-reference Recency Set (LIRS)} is another algorithm 
+which takes Inter-Reference-Recency into account instead of the recency 
+of a single pageas in LRU-K. 
+In LIRS, Inter-Reference-Recency (IRR) of a page refers to the 
+number of pages accessed between two consecutive references of that page. 
+The idea of the algorithm is to keep only a small number of pages with 
+high IRR since they are not accessed frequently (normally around 1\%) 
+\cite{chavan2011comparison}. 
+
+\textit{CLOCK-Pro} is another variant of CLOCK that attempts to approximate 
+LIRS by using page reuse distance, which is similar to IRR in LIRS. 
+A page with small reuse distance is categorized as \textit{hot} page, 
+and a page with large reuse distance is a \textit{cold} page. It also keep 
+historical metadata of previously accessed pages. Simulation studies showed 
+that the performance of CLOCK-Pro can approximate LIRS 
+\cite{chavan2011comparison}. 
+
+\textit{Adaptive Replacement Cache (ARC)} is an algorithm that keeps track of
+both frequently used and recently used pages by maintaining two lists: 
+L1 for pages that are accessed only once recently, and L2 for the pages 
+that are accessed more than once recently. 
+Each list is then split into the top cache entries(real pages) and bottom 
+ghost entries (metadata of evicted pages). 
+The pages and metadate entries are continually moved between these lists, 
+added to or removed from these lists to adaptively adjust the size 
+of frequently and recently used lists based on particular workloads  
+\cite{chavan2011comparison}. 
+
+\textit{CLOCK with Adaptive Replacement (CAR)} was proposed to inherit 
+the adaptivity of ARC and the implementation efficiency of CLOCK.  
+It implements two circular lists of cache and ghost entries as in ARC 
+\cite{chavan2011comparison}. 
+
+\subsubsection{Page cache LRU lists}
+
+Among page replacement policies, LRU is considered one of the most commonly 
+used algorithms that is successful for general purpose page cache. 
+It approximates well the future use of pages but fails when putting on the 
+top of the list a file that is accessed only once. 
+Therefore, Linux kernel implements two-list strategy, which is based on LRU, 
+due to its efficiency in both implementation and performance. 
+
+The two-list strategy in Linux kernel maintains two LRU lists: 
+\textit{active list} and \textit{inactive list} 
+\cite{linuxdev3rd2010,bovet2005understanding}.
+The lists work as queues, in which pages are added to the head and 
+removed from the tail.
+When a page is referenced, if it is not in the page cache, it then be added 
+to the inactive list.
+Should pages located on the inactive list be accessed, they will be moved 
+from the inactive to the active list. 
+They are also kept balanced by moving pages from the active list to the 
+inactive list when the active list grows significantly larger than the 
+inactive list.
+As a result, the active list only contains pages that are accessed more 
+than once, while the inactive list basically contains pages that are accessed 
+once only, or pages that have been accessed more than once but moved 
+from the active list.
+Since the pages in the active list are more frequently accessed, they are 
+consider "hot" and not available for eviction. In contrast, the pages in the 
+inactive list, which are less frequently accessed, are considered "cold" 
+and available for eviction.
+Both lists operate using LRU eviction policies, meaning that data that has
+not be accessed recently will be moved first.
+
+This two-list strategy, known as \textit{LRU/2}, not only solves the problem 
+of frequently accessed data in LRU, but also allows better performance with 
+simple implementation. 
+Now assume that in a particular scenario, when a user is working in a 
+workspace editing multiple smalle files. When the files are loaded, they are 
+read from disk for the first time and added to the page cache. 
+When the files are edited and then saved, new versions of the files are 
+written to the page cache.
+After that, if a saved file is opened again, the file is read directly from 
+the page cache instead disk, which makes reading time way faster. 
 
 \subsection{Flushing and periodical flushing}
 
-Beside cache eviction, flushing strategies are integral to proper page cache functioning.
-When sufficient memory is being occupied, the flushing process is synchronous. 
-However, even when there is sufficient available memory, written data will be 
-flushed to disk at a predefined interval through a process known as 
-\textit{periodical flushing}.
-Periodical flushing only flushes expired dirty pages, which remain dirty in
-page cache longer than an expiration time configured in the kernel.
-Different cache eviction algorithms have also been proposed
-\cite{owda2014comparison}.
+Unix systems allow write operations of dirty pages to be deferred and perform 
+a bigger physical write to disk to improve performance, which is called flushing 
+mechanisms. Beside cache eviction, flushing strategies are integral to proper 
+page cache functioning.
+Basically, dirty data flushing can be triggered under following conditions:
 
-\subsection{Page cache LRU lists}
+\begin{itemize}
+    \item When the amount of free memory is below a specific threshold, or the 
+    number of dirty pages has reached its limit because only clean pages are 
+    available for eviction.
+    \item A page has remained as dirty in the page cache for too long. 
+\end{itemize}
+
+In the first case, a synchronous flusher thread is called to flushed dirty pages 
+to disk when the amount of available memory is low (available memory 
+includes free memory and claimable memory).
+Besides, the Linux kernel has the variable \texttt{/proc/sys/vm/dirty\_ratio}, 
+which defines a percentage of total available memory. 
+When the amount of dirty data surpasses this level, flusher thread is awaken 
+to writeback dirty data to disk.
+In addition, there is another important variable, 
+which is \texttt{/proc/sys/vm/dirty\_background\_ratio},
+also defining a percentage of total available memory. 
+If the amount of free memory drops below this level, a flusher thread is 
+triggered by the kernel to start flushing dirty data.
+
+In the second case, a kernel thread (\texttt{pdflush}) is called to periodically 
+scan for pages that remains as dirty in page cache for an amount of time 
+longer than a predefined \textit{expired time}, and then to explicitly write 
+the content of these pages to disk. 
+This mechanism, called \textit{periodical flushing}, is to ensure that no page 
+can remain in page cache infinitely, and to keep data synchronized between 
+memory and storage.
+The Linux kernel awakes a flusher thread to writeback expired dirty page in 
+intervals defined by \texttt{/proc/sys/vm/dirty\_writeback\_interval} variable, 
+in milliseconds, with the default value usually set to 5000 milliseconds (5 seconds). 
+The expiration time can be set with the 
+\texttt{/proc/sys/vm/dirty\_expire\_interval} variable, 
+the default value is 30000 milliseconds (30 seconds) \cite{linuxdev3rd2010}.
 
 \section{Simulation vs experimentation}
 
-The Linux kernel uses a two-list strategy to flag pages for eviction.
-The two-list strategy is based on a least recently used (LRU) policy
-and uses an active and inactive list in its implementation.
-If accessed pages are not in the page cache, they are added to the inactive list.
-Should pages located on the inactive list be accessed, they will be moved from
-the inactive to the active list.
-The lists are also kept balanced by moving pages from the active list
-to the inactive list when the active list grows too large.
-Thus, the active list only contains pages which are accessed more than once
-and not evictable, while the inactive list includes pages accessed once only,
-or pages that have been accessed more than once but moved from the active list.
-Both lists operate using LRU eviction policies, meaning that data that has
-not be accessed recently will be moved first.
+
 
 \section{Simulation frameworks}
 
