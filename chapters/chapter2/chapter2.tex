@@ -272,57 +272,144 @@ The expiration time can be set with the
 \texttt{/proc/sys/vm/dirty\_expire\_interval} variable, 
 the default value is 30000 milliseconds (30 seconds) \cite{linuxdev3rd2010}.
 
-\section{Simulation vs experimentation}
+\section{Approaches in performance quantification}
 
+In Chapter~\ref{introduction}, we have previously mentioned the 
+rise of data-intensive applications in the era of Big Data and IoT.
+We have also discussed the reasons for the needs of High Performance 
+Computing (HPC) clusters or cloud to execute data-intensive applications.
+Therefore, it is crucial to quantify the performance of these applications 
+on HPC platforms. As a result, there have been different approaches 
+in order to study, quantify and understand the performance of platforms.
 
+Apparently, the most obvious approach to measure the performance 
+of any platform is to conduct real experiments by executing actual 
+applications on real-world platforms. 
+Undoubtedly, the experimental results of real platforms are reliable 
+since they are obtained from real-world production environments. 
+However, there still exists some undeniable shortcomings in this method. 
+There is a fact that real-world platforms are not built for 
+experimental purposes. 
+There is likelihood that the execution of experiments can interrupt 
+or detrimentally affect the production usage. 
+Moreover, HPC platforms are often shared between multiple users or processes 
+with dynamic allocated resources (e.g. unstable network throughput,  
+varying disk bandwidth, idle CPU time). 
+This may result in the reproducibility problem of the results since 
+dynamic system statuses can lead to unstable, varying experimental results. 
+In addition, even if platforms are stable and isolated, experiments may need 
+to be executed for multiple times. 
+This exposes another drawback when applications take a significant time 
+to finish. Since multiple repetitions can take a day to weeks to complete, 
+this can result in wasteful waiting time and high operational costs.  
+Last but not least, users and researchers can be limited to platform 
+configurations due to the fact that the resources are limited and 
+not every configuration is permitted. This can more or less 
+inhibit the insights from being obtained. 
+Given these challenges, researchers tend to look at alternatives 
+for this approach. 
 
-\section{Simulation frameworks}
+The second approach is to use emulation (e.g virtual machine, 
+network emulation). Emulation solutions make applications run 
+in particular environments that system calls are intercepted 
+and emulated \cite{casanova2008simgrid}. 
+Nevertheless, the problem of time-consuming applications, 
+which are very common in data-intensive applications, still remains. 
+Furthermore, 
 
-\subsection{Models and concerns}
+For the above mentioned difficulties with read-world platforms 
+and emulators, the third approach, which is to use simulation, has been  
+largely used in some areas in computer science \cite{casanova2008simgrid}.  
+Simulation frameworks usually share the same design with three main 
+components: (i) simulation models; (ii) platform specification; 
+and (iii) application specification.
+\textit{Simulation models} are the abstraction interactions between computer 
+resources (e.g. CPU, network, disks) and application activities throughout 
+application execution time. 
+These models estimate the completion time of application activities 
+that consume resources and evolve the the simulated execution time accordingly.
+\textit{Platform specification} describes structure (e.g number of hosts, network
+connections between hosts) of platforms with hardware properties 
+(e.g. CPU speed, disk capacity, network bandwidth).
+\textit{Application specification} describes sets of activities, their order 
+and relation in simulated applications.
 
-Many simulation frameworks have been developed to enable the
-simulation of parallel and distributed
+Using simulation tools can tackle the inherent disadvantages of using 
+real-world platforms. 
+The simulation frameworks are designed with the goal is to provide 
+a solution with fast simulation. 
+Thus, users can re-execute experiments in a short time at low costs.
+Furthermore, as the platform simulation resource simulation models 
+are decoupled from each other and from applications, users have 
+the freedom to choose their experimental platforms, which enables the 
+insights that are difficult to reveal with real-world platforms. 
+Specifically, simulation results are consistent and reproducible since 
+platforms are initiated with detailed specifications. 
+As a result, this approach has been widely adopted in scientific studies
+in computer science. 
+
+\section{Simulation}
+
+\subsection{Simulation frameworks}
+
+Over the years, many simulation frameworks have been developed to enable 
+the simulation of parallel and distributed 
 applications~\cite{optorsim, gridsim, groudsim, cloudsim,
 nunez2012simcan,nunez2012icancloud, mdcsim, dissect_cf,
 cloudnetsimplusplus, fognetsimplusplus, casanova2014simgrid,
-ROSS, casanova2020fgcs}. These frameworks implement simulation
-models and abstractions to aid the development of simulators
-for studying the functional and performance behaviors of
-application workloads executed on various hardware/software
-infrastructures. 
+ROSS, casanova2020fgcs}. 
+There are two main approaches in these frameworks: \textit{off-line} and 
+\textit{on-line} simulation \cite{casanova2014simgrid}. 
+In off-line simulation, system events logged with time-stamped are retrieved 
+when real applications are executed on real platforms.
+The the simulator replays these logs as if they were being executed 
+on another platform. 
+However, the issue with this method is that the logs obtained are specific to 
+a particular platform, which means simulation of different platforms 
+requires different logs.
+The alternative for off-line simulation to address this issue is 
+on-line simulation.
+In this approach, application execution is simulated as if it were running 
+on the target platform by simulating the amount of resources needed 
+to run the application in reality. 
 
-The two main concerns for simulation are accuracy,
-the ability to faithfully reproduce real-world executions, and
-scalability, the ability to simulate large/long real-world
-executions quickly and with low RAM footprint. The above
-frameworks achieve different compromises between the two.  At
-one extreme are discrete-event models that capture
+\subsection{Simulation models}
+
+In the previous section we have mentioned that simulation models are 
+a component in most simulation frameworks.
+The simulation models and abstractions are implemented to aid the 
+development of simulators for studying the functional and performance 
+behaviors of application workloads executed on various 
+hardware/software infrastructures. 
+The models for resources such as compute, network, disk have been proposed, 
+ranging from simple mathematical equations, analytical models 
+to complex processes.
+For example, to simulate a file read from disk, a simple mathematical model 
+can estimate read time as file size divided by disk bandwidth, while 
+a more complex, discrete-event model simulate detailed events such as 
+disk seeks, read buffer, etc to fulfill the read request.
+
+The two main concerns for simulation are accuracy, the ability to 
+faithfully reproduce real-world executions, and scalability, 
+the ability to simulate large/long real-world executions quickly 
+and with low RAM footprint. 
+Simulation frameworks often achieve different compromises between the two.  
+At one extreme are discrete-event models that capture
 ``microscopic'' behaviors of hardware/software systems (e.g.,
 packet-level network simulation, block-level disk simulation,
-cycle-accurate CPU simulation), which favor accuracy over
-speed.  At the other extreme are analytical models that capture
-``macroscopic'' behaviors via mathematical models.  While these
-models lead to fast simulation, they must be developed
-carefully if high levels of accuracy are to be
-achieved~\cite{velhoTOMACS2013}. 
-
-In this  work, we use the \simgrid and \wrench simulation
-frameworks.  The years of research and development invested in
-the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
-culminated in a set of state-of-the-art macroscopic simulation
-models that yield high accuracy, as demonstrated by
-(in)validation studies and comparisons to competing
-frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
-nstools_07, lebre2015, pouilloux:hal-01197274,
-smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
-significant drawback of \simgrid is that its simulation
-abstractions are low-level, meaning that implementing a
-simulator of complex systems can be
-labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
-the \wrench simulation framework~\cite{casanova2020fgcs}
-builds on top of \simgrid to provide higher-level simulation
-abstractions, so that simulators of complex applications and
-systems can be implemented with a few hundred lines.
+cycle-accurate CPU simulation), which favor accuracy over speed.  
+For examples, CloudSim~\cite{cloudsim} and 
+iCanCloud~\cite{nunez2012icancloud} are the simulators that provide 
+packet-level network model, DiskSim~\cite{bucy2003disksim} simulates 
+storage devices at block-level.  
+At the other extreme are analytical models that capture
+``macroscopic'' behaviors via mathematical models.  
+GridSim~\cite{gridsim}, CloudSim~\cite{cloudsim}, and 
+SimGrid~\cite{casanova2014simgrid} provide a simple data access time 
+model based on a (fixed or randomly generated) seek time and 
+fixed bandwidths. 
+While these models lead to fast simulation, they must be developed
+carefully if high levels of accuracy are to be achieved~\cite{velhoTOMACS2013}. 
 
 \subsection{Existing data caching simulation}
 
@@ -350,3 +437,27 @@ abstractions, because it is extensible, and because it reuses
 \simgrid's scalable and accurate models.
 
 \subsection{SimGrid and WRENCH}
+
+\subsubsection{SimGrid}
+Simulators developed and used by researchers in parallel and distributed 
+computing are often domain-specific \cite{casanova2014simgrid}.
+
+In this work, we use the \simgrid and \wrench simulation
+frameworks.  The years of research and development invested in
+the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
+culminated in a set of state-of-the-art macroscopic simulation
+models that yield high accuracy, as demonstrated by
+(in)validation studies and comparisons to competing
+frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
+nstools_07, lebre2015, pouilloux:hal-01197274,
+smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
+significant drawback of \simgrid is that its simulation
+abstractions are low-level, meaning that implementing a
+simulator of complex systems can be
+labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
+the \wrench simulation framework~\cite{casanova2020fgcs}
+builds on top of \simgrid to provide higher-level simulation
+abstractions, so that simulators of complex applications and
+systems can be implemented with a few hundred lines.
+
+\subsubsection{WRENCH}
