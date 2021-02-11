@@ -19,7 +19,7 @@ have resulted in the evolution in Big Data and data-intensive applications,
 which have been increasingly playing an important role in many fields such as 
 science, medical, military, finance, commerce, etc.
 
-Big Data is usually defined with "three Vs" corresponding to \textit{volume}, 
+Big Data is usually defined with ``three V'' corresponding to \textit{volume}, 
 \textit{velocity} and \textit{variety} ~\cite{de2016formal}.  
 For \textit{volume}, the vast amounts of data require scalable and distributed 
 approaches for storage solutions as well as querying of information and insights.  
@@ -51,7 +51,7 @@ There have been different approaches in order to measure the performance
 of platforms in particular metrics such as execution time, 
 resources consumption, power consumption, etc. 
 
-\section{Quantifying performance}
+\section{Performance quantification}
 
 Quantifying performance of the platforms basically relies on empirical methods, 
 which require running experiments on those platforms. 
@@ -93,36 +93,37 @@ fognetsimplusplus, casanova2014simgrid, ROSS, casanova2020fgcs}.
 
 \section{Page cache and simulation}
 
-Due to hardware limitations, the performance of platforms can be hampered by 
-bottlenecks such as data transfer through network links, accessing data on disks. 
-When it comes to disk I/O, the bottleneck remains as a result of limited disk read 
-and write bandwidths, seek time involved in disk accesses, and shared bandwidth 
-between processes. 
-In data-intensive applications, a significant proportion of execution time is spent 
-on data read and write.
-Thus, the detrimental effects of I/O bottleneck can be more severe on this type 
-of tasks. 
-Failing to effectively access data can hinder the performance of the whole application, 
-and can lead to wasteful idle time of other resources. 
+Due to hardware limitations, the performance of platforms can be hampered 
+by bottlenecks including data transfer through network links, accessing data 
+on disks, etc. 
+When it comes to disk I/O, the bottleneck remains as a result of limited 
+disk read and write bandwidths, seek time involved in disk accesses, 
+and shared bandwidth between processes. 
+In data-intensive applications, a significant proportion of execution time 
+is spent on data read and write.
+Thus, the detrimental effects of I/O bottleneck can be more severe on 
+this type of tasks. 
+Failing to effectively access data can hinder the performance of the 
+whole application, and can lead to wasteful idle time of other resources. 
 Although efforts to increase the bandwidth of storage devices with 
-advancements in technology, such as solid-state drive (SSD), the I/O bottleneck 
-still exists.
+advancements in technology, such as solid-state drive (SSD), 
+the I/O bottleneck still exists.
 
-Caching is an ubiquitous technique to minimize data transfer 
-from low-speed storage by using a high-speed storage layer to store data 
-temporarily. Caching reuses previously accessed data for future requests, so 
-that it helps reducing data transfer times. 
+Caching is an ubiquitous technique to minimize data transfer from 
+low-speed storage by using a high-speed storage layer to store data 
+temporarily. Caching reuses previously accessed data for future requests, 
+so that it helps reducing data transfer times. 
 Following the idea of caching, page cache is an architectural approach 
-implemented in Linux that leverages main memory to improve the effectiveness 
-in accessing data on disks, reduce filesystem data transfer times.
+implemented in Linux that leverages main memory to improve the 
+effectiveness in accessing data on disks, reduce filesystem data transfer times.
 As main memory is known to have significant faster read and write bandwidths 
 compared to those of disks, the idea behind page cache is to make I/O operations 
 occur in memory instead of disks.
 With the page cache, previously read data can be kept in cache and then re-read 
 directly from memory with memory read bandwidth. 
-In writing, written data can be written to memory with memory write bandwidth 
-before being asynchronously flushed to disk, resulting in improved I/O performance 
-on slower storage devices. 
+In writing, data can be written to memory with memory write bandwidth 
+before being asynchronously flushed to disk, resulting in better I/O performance 
+than on slower storage devices. 
 In case the amount of cache available is not sufficient for caching new data, 
 data previously read or written to page cache can be flushed to disks or 
 evicted from cache with data flushing and cache eviction mechanisms. 
@@ -136,7 +137,7 @@ Hence, these factors should be taken into account when determining the impact
 of I/O on application performance, particularly in data-intensive applications.
 
 Aside from hardware resources, the existence of the page cache in systems has 
-considerable impacts on the performance of platforms when it mitigates the I/O 
+considerable impacts on the performance of platforms as it mitigates the I/O 
 bottleneck.
 As such, it is necessary to have a simulation model of the page cache when 
 simulating data-intensive applications in order to achieve higher accuracy  
@@ -179,8 +180,8 @@ In addition, our simulator not only achieves more accurate simulation results
 but also simulates correctly the behaviors of the page cache, proves the correctness 
 of the model and opens the opportunities to be further enhanced. 
 
-
 \section{Thesis organization}
+
 This thesis consists of five main parts divided into chapters.
 Chapter~\ref{relatedwork} provides the background knowledge of Linux page cache 
 with key features and mechanisms. 

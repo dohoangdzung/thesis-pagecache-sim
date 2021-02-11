@@ -230,7 +230,7 @@ expected. The Python prototype and \wrench-cache exhibited nearly
 identical memory profiles, which reinforces the confidence in our
 implementations.
 
-\begin{figure*}[ht]
+\begin{figure*}[!h]
     \centering
        \includegraphics[width=\linewidth]{figures/cached_files_full.pdf}
        \caption{Cache contents \emph{after} single-threaded application I/O operations}
@@ -251,6 +251,8 @@ whereas in the simulated execution, only a part of it was cached.
 This was due to the fact that the Linux kernel tends to not evict pages that
 belong to files being currently written (File~3 in this case), which we could 
 not easily reproduce in our model.
+
+\FloatBarrier
 
 \subsection{Concurrent applications (Exp 2)}
 
@@ -275,6 +277,8 @@ was saturated with dirty data and needed flushing.
     (\textit{Exp 2})}
     \label{fig:multi_local}
 \end{figure*}
+
+\FloatBarrier
 
 \subsection{Remote storage (Exp 3)}
 
@@ -306,6 +310,8 @@ less cache hits and more data read from disk in simulation than in reality.
     \label{fig:multi_nfs}
 \end{figure*}
 
+\FloatBarrier
+
 \subsection{Real application (Exp 4)}
 Similar to the synthetic application, simulation errors of the real 
 application were substantially reduced by the WRENCH-cache simulator 
@@ -324,6 +330,8 @@ very accurately simulated by both WRENCH and WRENCH-cache.
     \label{fig:nighres}
 \end{figure*}
 
+\FloatBarrier
+
 \subsection{Simulation time}
 
 As is the case for \wrench, simulation time with \wrench-cache scales
@@ -338,7 +346,7 @@ cache in NFS, which bypasses flushing operations.
 \begin{figure}[!h]
     \begin{subfigure}{\columnwidth}
         \centering
-        \includegraphics[width=\linewidth]{result/multi/figures/simulation_time.pdf}
+        \includegraphics[width=0.8\linewidth]{result/multi/figures/simulation_time.pdf}
     \end{subfigure}
     \caption{Simulation time comparison. \wrench-cache scales
     linearly with the number of concurrent applications, albeit
