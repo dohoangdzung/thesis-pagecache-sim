@@ -385,9 +385,9 @@ The models for resources such as compute, network, disk have been proposed,
 ranging from simple mathematical equations, analytical models 
 to complex processes.
 For example, to simulate a file read from disk, a simple mathematical model 
-can estimate read time as file size divided by disk bandwidth, while 
-a more complex, discrete-event model simulate detailed events such as 
-disk seeks, read buffer, etc to fulfill the read request.
+can estimate read time as file size divided by disk bandwidth, 
+while a more complex, discrete-event model simulates detailed events 
+such as disk seeks, read buffer, etc to fulfill the read request.
 
 The two main concerns for simulation are accuracy, the ability to 
 faithfully reproduce real-world executions, and scalability, 
@@ -405,7 +405,7 @@ storage devices at block-level.
 At the other extreme are analytical models that capture
 ``macroscopic'' behaviors via mathematical models.  
 GridSim~\cite{gridsim}, CloudSim~\cite{cloudsim}, and 
-SimGrid~\cite{casanova2014simgrid} provide a simple data access time 
+\simgrid~\cite{casanova2014simgrid} provide a simple data access time 
 model based on a (fixed or randomly generated) seek time and 
 fixed bandwidths. 
 While these models lead to fast simulation, they must be developed
@@ -413,51 +413,171 @@ carefully if high levels of accuracy are to be achieved~\cite{velhoTOMACS2013}.
 
 \subsection{Existing data caching simulation}
 
-Although the Linux page cache has a large impact on I/O
-performance, and thus on the execution of data-intensive
-applications, its simulation is rarely considered in the above
-frameworks.  Most frameworks merely simulate I/O operations
-based on storage bandwidths and capacities.  The SIMCAN
-framework does models page caching by storing data accessed on
-disk in a block cache~\cite{nunez2012simcan}.  Page cache is
-also modeled in iCanCloud through a component that manages
-memory accesses and cached data~\cite{nunez2012icancloud}.
-However, the scalability of the iCanCloud simulator is limited
-as it uses microscopic models.  Besides, none
-of these simulators provide any writeback cache simulator nor
-cache eviction policies through LRU lists.  Although cache
-replacement policies are applied in~\cite{xu2018saving} to
-simulate in-memory caching, this simulator is specific to
-energy consumption of multi-tier heterogeneous networks.
+Although the Linux page cache has a large impact on I/O performance, 
+and thus on the execution of data-intensive applications, 
+its simulation is rarely considered in the above frameworks.  
+Most simulation frameworks merely simulate I/O operations based on 
+storage bandwidths and capacities such as GridSim~\cite{gridsim}, 
+CloudSim~\cite{cloudsim}, and \simgrid~\cite{casanova2014simgrid}. 
+Some other simulators like DiskSim provide IO simulation with 
+discrete-event storage model, which provide high accuracy 
+but low scalability. However, these simulators only model 
+the behaviors in storage device, without taking the I/O mechanisms 
+in operating systems into account. 
 
-In this study, we implement a page cache simulation model in the
-\wrench framework. We targeted \wrench because it is a recent,
-actively developed framework that provides convenient simulation
-abstractions, because it is extensible, and because it reuses
-\simgrid's scalable and accurate models.
+The SIMCAN framework does models page caching by storing data 
+accessed on disk in a block cache~\cite{nunez2012simcan}. 
+They proposed a \textit{volume manager} model, which is responsible for 
+operating read and write requests of data blocks. 
+In the volume manager model, there is a \textit{data block cache} component, 
+which is in charge of storing cached data blocks in a cache memory. 
+When the blocks stored in the cache memory are requested, they can be 
+read from this cache instead of requesting a disk read, which results in 
+faster reads than from file systems.
+However, there was not a specific limit in the size of cache memory. 
+In addition, dirty data, which obviously play an important role in the page,
+was not modeled. 
+Also, data flushing and cache eviction mechanisms were not mentioned 
+in this study. 
+
+\textit{iCanCloud} is another simulator that attempted to model the page cache 
+through a component that manages memory accesses and cached 
+data~\cite{nunez2012icancloud}. 
+In iCanCloud, memory is split into two parts: memory used by applications 
+and memory used for disk cache, which was ignored in SIMCAN. 
+Nevertheless, key features of the page cache including dirty data, 
+data flushing and cache eviction mechanisms were still missing 
+in this simulator.
+Moreover, as iCanCloud uses microscopic models to simulate memory 
+with memory accesses, its scalability is limited. 
+
+Although there is a study in~\cite{xu2018saving} that applied cache 
+replacement policies in to simulate in-memory caching, this simulator 
+is specific to energy consumption of multi-tier heterogeneous networks.
+In general, a proper simulation model of page cache is still missing 
+in most simulation frameworks.
 
 \subsection{SimGrid and WRENCH}
 
-\subsubsection{SimGrid}
-Simulators developed and used by researchers in parallel and distributed 
-computing are often domain-specific \cite{casanova2014simgrid}.
+\subsubsection{SimGrid framework}
+
+Over the years, simulators developed and used by researchers in 
+parallel and distributed computing are often domain-specific 
+\cite{casanova2014simgrid}.
+As discussed in the previous section, there is always a trade-off between 
+simulation accuracy and scalability of the simulation frameworks due 
+to the models used in those tools. 
+\simgrid is a versatile simulation framework for HPC cluster, cloud and 
+grid computing that can achieve high simulation speed and accuracy.
+
+Started in 1999, \simgrid has three main versions released until the moment 
+this thesis is written. 
+The \simgrid framework is developed in C with the main components shown in 
+Figure~\ref{fig:simgrid}.
+
+\begin{figure*}[!h]
+     \centering
+     \includegraphics[width=\linewidth]{figures/simgrid.png}
+%     \vspace*{-0.7cm}
+     \caption{Overview and main components in \simgrid framework}
+%     \vspace*{0.5cm}
+     \label{fig:simgrid}
+\end{figure*}
+
+At the top are three APIs provided by \simgrid. 
+The MSG API enables users to describe simulated applications as sets of 
+concurrent processes. 
+The SMPI API is also used to simulate applications as sets of 
+concurrent processes, but these processes are automatically created from 
+existing applications written in C or Fortran that uses the MPI standard.
+The simulation mechanisms for the concurrent processes for MSG and SMPI APIs
+are implemented as part of SIMIX layer. It acts like a kernel that provides 
+process control and synchronization abstractions by maintaining a set of 
+condition variables.
+The third API, SimDAG, does not use concurrent processes but instead 
+allows users to specify abstract task graphs of communicating computational 
+tasks with non-cyclic dependencies.
+The simulation core that simulates the execution of activities on resources, 
+is called SURF and is shown at the bottom of the figure.
+Each application activity is described by the amount of remaining workload 
+and total amount of workload on resources.
+An activity finishes when it reaches zero amount of remaining workload and 
+signals SIMIX with corresponding condition variables. 
+ 
+Throughout the history, \simgrid has been developed with the goal 
+is to improve both accuracy and scalability. 
+The framework uses a unified model for simulation of the execution of activities 
+on simulated resources.
+This model is purely analytical so as to afford scalability by avoiding cycle-, 
+block-, and packet-level simulation of compute, storage, and network 
+resource usage \cite{casanova2014simgrid}.
+In the past years, \simgrid has also been the object of many invalidation and 
+validation studies \cite{bedaride2013toward,velho2013validity,
+velho2009accuracy,lebre2015}, and its simulation models 
+have been shown to provide compelling advantages over other simulation 
+frameworks in terms of both accuracy and scalability.
+
+\subsubsection{WRENCH framework}
+
+Several studies acknowledge that the popular \simgrid framework
+offers compelling capabilities in terms of scalability and simulation accuracy.
+Nevertheless, due to the low-level API, using \simgrid to implement 
+a simulator of a complex system is extremely labor-intensive~\cite{kecskemeti_2014}. 
+For that reason, \wrench ~\cite{casanova2020fgcs}, a framework for 
+simulation of Workflow Management Systems (WMSs), has been developed 
+to provide convenient, reusable, high-level abstractions but that builds on 
+SimGrid so as to benefit from its scalable and accurate simulation models.
+\wrench was not developed as a simulator but a simulation framework 
+distributed as a C++ library. 
+
+\begin{figure*}[!h]
+     \centering
+     \includegraphics[width=0.75\linewidth]{figures/wrench.png}
+%     \vspace*{-0.7cm}
+     \caption{The four layers in the \wrench architecture from bottom 
+     to top: simulation core, simulated core services, 
+     simulated WMS implementations, and simulators.}
+%     \vspace*{0.5cm}
+     \label{fig:wrench}
+\end{figure*}
+
+Figure~\ref{fig:wrench} shows the software architecture of \wrench. 
+At the bottom level is \simgrid, the simulation core, which is responsible for 
+simulating low-level software and hardware stacks.
+The next layer implements CI services that are commonly
+found in distributed platforms.
+Currently, WRENCH provides services in 4 categories: 
+\textit{compute services} that provide access to compute resources to 
+execute applications; 
+\textit{storage services} that provide access to storage resources for 
+storing data data; 
+\textit{network monitoring services} that can be queried to
+determine network distances; and 
+\textit{data registry services} that can be used to track the data location.
+The above layer in the software architecture includes simulated WMSs, 
+which interact with the CI services in the lower layer using the WRENCH 
+Developer API.
+Finally, the top layer consists of simulators that configure and instantiate 
+CI services and WMSs on a given simulated hardware platform, that launch
+simulation, and that analyze the simulation output.
+
+\subsubsection{Why \simgrid and \wrench?}
 
 In this work, we use the \simgrid and \wrench simulation
-frameworks.  The years of research and development invested in
+frameworks to implement a page cache simulation model.  
+The years of research and development invested in
 the popular \simgrid simulation framework~\cite{casanova2014simgrid}, have
 culminated in a set of state-of-the-art macroscopic simulation
 models that yield high accuracy, as demonstrated by
 (in)validation studies and comparisons to competing
 frameworks~\cite{smpi_validity, velhoTOMACS2013, simutool_09,
 nstools_07, lebre2015, pouilloux:hal-01197274,
-smpi_tpds2017,  7885814, 8048921, 7384330}.  But one
-significant drawback of \simgrid is that its simulation
+smpi_tpds2017,  7885814, 8048921, 7384330}.  
+But one significant drawback of \simgrid is that its simulation
 abstractions are low-level, meaning that implementing a
-simulator of complex systems can be
-labor-intensive~\cite{kecskemeti_2014}. To remedy this problem,
-the \wrench simulation framework~\cite{casanova2020fgcs}
-builds on top of \simgrid to provide higher-level simulation
-abstractions, so that simulators of complex applications and
-systems can be implemented with a few hundred lines.
-
-\subsubsection{WRENCH}
+simulator of complex systems can be labor-intensive. 
+To remedy this problem, we targeted \wrench because it is a recent,
+actively developed framework that provides convenient higher-level 
+simulation abstractions so that simulators of complex applications and
+systems can be implemented with a few hundred lines, because it is extensible, 
+and because it reuses \simgrid's scalable and accurate models.
