@@ -14,15 +14,18 @@ There are two reasons that make the disk caches important to
 operating systems. 
 First, disk accesses are several orders of magnitude slower than 
 memory accesses. 
-Second, there is a likelihood data accessed before will be accessed again 
-in near future \cite{linuxdev3rd2010}. 
+Second, there is a likelihood that data accessed before will be accessed 
+again in near future \cite{linuxdev3rd2010}. 
 With memory bandwidth, which is much faster than disk bandwidth, 
 combined with the situations that data can be accessed in memory instead 
-of on disk, the I/O performance can be largely improved. 
-In Linux, the page cache is a part of RAM, which includes physical pages 
+of on disk, the I/O performance can be markedly improved. 
+The Linux page cache is a part of RAM, which includes physical pages 
 referring to pages on disk. 
 The size of the page cache is dynamic when it can grow when there is 
-enough free memory, and can be shrink to release memory if needed. 
+available free memory, and can be shrunk to release memory if needed. 
+Data cached in the page cache consists of pages, which means files must 
+not be cached entirely, the page cache can keep the whole file, 
+or only part a file. 
 
 When the kernel starts a read operation, it checks if the required data is 
 in memory. If yes, called a \textit{cache hit}, data is then read directly 
@@ -30,12 +33,11 @@ from memory, with memory bandwidth, instead of from disk.
 If not, called a \textit{cache miss}, data is read from disk and the kernel 
 places a new entry representing this data in the page cache for later reads 
 \cite{linuxdev3rd2010}. 
-Data cached in the the page cache is pages, which means files must not be 
-cached entirely, the page cache can keep the whole file, or only part a file. 
+In writing, the behavior of the page cache is more sophisticated.
 
 \subsubsection{Writeback and writethrough page cache}
 
-When use of page cache is enabled for a given filesystem, all written pages 
+When the page cache is enabled for a given filesystem, all written pages 
 are written first to page cache, prior to being written to disk.
 Accessing of these written pages may result in cache hits, should the pages 
 remain in memory.
@@ -53,7 +55,7 @@ The second strategy is \textit{writethrough}, in which the kernel updates both
 disk and memory cache in write operations. The name \textit{writethrough} 
 itself suggests that data is written \textit{through} the page cache to disk 
 with disk write bandwidth \cite{linuxdev3rd2010}.
-This is a simple solution that can keep data in cache, synchronized 
+This is a simple solution that can keep data in cache synchronized 
 between page cache and disk, but it does not make the write operations 
 benefit from fast memory write bandwidth. 
 
@@ -75,21 +77,24 @@ a bulk write at a later time \cite{linuxdev3rd2010}.
 \subsubsection{Caching on NFS}
 
 Data caching requires keeping data close to where it is requested. 
-In network filesystem (NFS), data caching means not sending requests 
-to server over the network. Thus, data is cached on NFS client cache instead 
-of a remote disk \cite{eisler2001managing}. 
+In network filesystem (NFS), data caching means not sending data access 
+requests to server over the network. 
 In addition, some cache schemes are restricted to ensure data integrity and 
 consistency depending on the structure of the filesystem.
+Thus, data is cached on NFS client cache instead of a remote disk 
+\cite{eisler2001managing}. 
+
 In reading on NFS, if data is cached on client, data is read from client cache 
 as with local filesystem. If required data is not cached on the client, 
 it will be read from server. On server side, the kernel also checks for the 
 availability of data in server cache to decide whether data is read from 
 cache or disk. 
+
 However, there is no server cache in writing since the data written to 
-NFS server cannot be cached and must be written to disk before the write 
-call on the NFS client finishes to ensure data integrity. 
-If server cache is enable for writing, if the server crashes during a cache 
-write could result in a problem since the client could not be aware of if 
+NFS server must not be cached on server side but must be written to 
+disk before the write call on the NFS client finishes to ensure data integrity. 
+If server cache was enable for writing, a server crash during a cache 
+write could result in a problem that the client could not be aware of whether 
 data has been written successfully. 
 On the other hand, given a scenario where multiple write operations 
 queue up on client side, a client failure before data is written could leave 
@@ -100,28 +105,31 @@ Thus, only writethrough strategy can be implemented for writing on NFS.
 
 Cache eviction mechanism is one of the key features in the operations of 
 page cache. 
-It is responsible for deciding removing pages from the page cache to make 
-memory space available for new entries as well as free RAM for other uses. 
-Whenever space in memory becomes limited, either as a result of application 
-memory or page cache use, page cache data may be evicted. 
-Only clean data, which is not marked as dirty and persisted to storage, can be 
-flagged for eviction and removed from memory. 
-If clean pages are insufficient, written data that has not yet been persisted 
-to disk (dirty data) must first be copied (flushed) to storage and marked as 
-clean to make more pages available for eviction 
+It is responsible for deciding which pages to be removed from the 
+page cache to make memory space available for new entries as well as 
+free memory for other uses. 
+Whenever free memory becomes insufficient, either as a result of application 
+allocated memory or page cache use, data in data page cache may be evicted. 
+Only clean data, which is not marked as dirty and persisted to storage, 
+can be flagged for eviction and removed from memory. 
+If clean pages are insufficient, dirty data must first be copied (flushed) 
+to storage and marked as clean to make more pages available for eviction 
 \cite{linuxdev3rd2010,bovet2005understanding}. 
 The crucial part in the cache eviction mechanism is to decide which pages 
 to evict. According to the idea of the page cache, data that is more likely 
 to be accessed in the future should be kept in page cache, and the data 
 that is least likely to be used should be evicted. 
-Different cache eviction algorithms have also been proposed
-\cite{chavan2011comparison}.
-
-\subsubsection{Page cache replacement policies}
 
 We have mentioned about the page cache, adding pages to the page cache, 
 cache eviction. But how the page cache is exactly structured, how data is 
 placed and removed from the page cache?
+Indeed, there are different cache eviction algorithms that have been 
+proposed in order to maximize the effect of the cache as well as to 
+ease the implementation overhead \cite{chavan2011comparison}.
+In the next section, we will provide a brief summary some of the popular 
+cache eviction algorithms.
+
+\subsubsection{Page cache replacement policies}
 
 The idea of the page cache is to keep data that is likely to be accessed again 
 in the future, but an algorithm that knows the future in advance, often 
@@ -133,7 +141,7 @@ One of the most commonly used strategy is \textit{Least Recently Used (LRU)}.
 This page replacement policy is based on the principle of locality that 
 data references of a process tend to cluster. Thus, it selects pages that 
 has not been referred for a longest time to remove 
-\cite{chavan2011comparison}.However, one of the drawbacks of LRU 
+\cite{chavan2011comparison}. However, one of the drawbacks of LRU 
 is not considering data access frequency.
 
 The \textit{CLOCK} algorithm improves this shortcoming of LRU by 
@@ -156,7 +164,7 @@ compared to LRU \cite{chavan2011comparison}.
 
 \textit{Low Inter-reference Recency Set (LIRS)} is another algorithm 
 which takes Inter-Reference-Recency into account instead of the recency 
-of a single pageas in LRU-K. 
+of a single page as in LRU-K. 
 In LIRS, Inter-Reference-Recency (IRR) of a page refers to the 
 number of pages accessed between two consecutive references of that page. 
 The idea of the algorithm is to keep only a small number of pages with 
@@ -166,10 +174,10 @@ high IRR since they are not accessed frequently (normally around 1\%)
 \textit{CLOCK-Pro} is another variant of CLOCK that attempts to approximate 
 LIRS by using page reuse distance, which is similar to IRR in LIRS. 
 A page with small reuse distance is categorized as \textit{hot} page, 
-and a page with large reuse distance is a \textit{cold} page. It also keep 
-historical metadata of previously accessed pages. Simulation studies showed 
-that the performance of CLOCK-Pro can approximate LIRS 
-\cite{chavan2011comparison}. 
+and a page with large reuse distance is a \textit{cold} page. This strategy also 
+keeps historical metadata of previously accessed pages. 
+Simulation studies showed that the performance of CLOCK-Pro can 
+approximate LIRS \cite{chavan2011comparison}. 
 
 \textit{Adaptive Replacement Cache (ARC)} is an algorithm that keeps track of
 both frequently used and recently used pages by maintaining two lists: 
@@ -177,7 +185,7 @@ L1 for pages that are accessed only once recently, and L2 for the pages
 that are accessed more than once recently. 
 Each list is then split into the top cache entries(real pages) and bottom 
 ghost entries (metadata of evicted pages). 
-The pages and metadate entries are continually moved between these lists, 
+The pages and metadata entries are continually moved between, 
 added to or removed from these lists to adaptively adjust the size 
 of frequently and recently used lists based on particular workloads  
 \cite{chavan2011comparison}. 
@@ -205,7 +213,7 @@ When a page is referenced, if it is not in the page cache, it then be added
 to the inactive list.
 Should pages located on the inactive list be accessed, they will be moved 
 from the inactive to the active list. 
-They are also kept balanced by moving pages from the active list to the 
+The lists are also kept balanced by moving pages from the active list to the 
 inactive list when the active list grows significantly larger than the 
 inactive list.
 As a result, the active list only contains pages that are accessed more 
@@ -213,15 +221,15 @@ than once, while the inactive list basically contains pages that are accessed
 once only, or pages that have been accessed more than once but moved 
 from the active list.
 Since the pages in the active list are more frequently accessed, they are 
-consider "hot" and not available for eviction. In contrast, the pages in the 
-inactive list, which are less frequently accessed, are considered "cold" 
+consider ``hot" and not available for eviction. In contrast, the pages in the 
+inactive list, which are less frequently accessed, are considered ``cold" 
 and available for eviction.
 Both lists operate using LRU eviction policies, meaning that data that has
 not be accessed recently will be moved first.
 
 This two-list strategy, known as \textit{LRU/2}, not only solves the problem 
 of frequently accessed data in LRU, but also allows better performance with 
-simple implementation. 
+a simple implementation. 
 Now assume that in a particular scenario, when a user is working in a 
 workspace editing multiple smalle files. When the files are loaded, they are 
 read from disk for the first time and added to the page cache. 
@@ -233,8 +241,9 @@ the page cache instead disk, which makes reading time way faster.
 \subsection{Flushing and periodical flushing}
 
 Unix systems allow write operations of dirty pages to be deferred and perform 
-a bigger physical write to disk to improve performance, which is called flushing 
-mechanisms. Beside cache eviction, flushing strategies are integral to proper 
+a bigger physical write to disk to improve performance. The write of 
+dirty data from the page cache to disk is called flushing mechanism. 
+Beside cache eviction, flushing strategies are integral to proper 
 page cache functioning.
 Basically, dirty data flushing can be triggered under following conditions:
 
@@ -256,7 +265,7 @@ In addition, there is another important variable,
 which is \texttt{/proc/sys/vm/dirty\_background\_ratio},
 also defining a percentage of total available memory. 
 If the amount of free memory drops below this level, a flusher thread is 
-triggered by the kernel to start flushing dirty data.
+triggered by the kernel to start flushing dirty data \cite{linuxdev3rd2010}.
 
 In the second case, a kernel thread (\texttt{pdflush}) is called to periodically 
 scan for pages that remains as dirty in page cache for an amount of time 
@@ -285,7 +294,7 @@ in order to study, quantify and understand the performance of platforms.
 Apparently, the most obvious approach to measure the performance 
 of any platform is to conduct real experiments by executing actual 
 applications on real-world platforms. 
-Undoubtedly, the experimental results of real platforms are reliable 
+The experimental results of real platforms are undoubtedly reliable 
 since they are obtained from real-world production environments. 
 However, there still exists some undeniable shortcomings in this method. 
 There is a fact that real-world platforms are not built for 
@@ -317,7 +326,7 @@ Nevertheless, the problem of time-consuming applications,
 which are very common in data-intensive applications, still remains. 
 Furthermore, 
 
-For the above mentioned difficulties with read-world platforms 
+For the difficulties mentioned above with read-world platforms 
 and emulators, the third approach, which is to use simulation, has been  
 largely used in some areas in computer science \cite{casanova2008simgrid}.  
 Simulation frameworks usually share the same design with three main 
@@ -362,7 +371,7 @@ There are two main approaches in these frameworks: \textit{off-line} and
 \textit{on-line} simulation \cite{casanova2014simgrid}. 
 In off-line simulation, system events logged with time-stamped are retrieved 
 when real applications are executed on real platforms.
-The the simulator replays these logs as if they were being executed 
+The simulator replays these logs as if they were being executed 
 on another platform. 
 However, the issue with this method is that the logs obtained are specific to 
 a particular platform, which means simulation of different platforms 
