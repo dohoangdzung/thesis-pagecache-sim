@@ -7,26 +7,26 @@ In the last decades, information technology has been significantly changing the
 world we are living in. 
 Thanks to both software and hardware advancements, the application development 
 and operational costs have become more reasonable. 
-As a result, applications has been widely used in various fields by companies, 
-organizations and individuals. Simultaneously, they have been collecting a massive 
-amount of data at increasing generating speed.
+As a result, \english{applications has been widely used} in various fields by companies, 
+organizations and individuals. Simultaneously, \english{they} have been collecting a massive 
+amount of data at \english{increasing generating speed}.
 In addition, the last decade witnessed the rise of Big Data and IoT with the rapid 
 development in mobile devices, wearable devices, smart appliances and connectivity  
 technologies. Data has increasingly been collected from these sources and transferred 
-through network day by day. 
-The ever-increase in the number and scale of open-data and data sharing initiatives 
+through network \english{day by day}. 
+The \english{ever-increase} in the number and scale of open-data and data sharing initiatives 
 have resulted in the evolution in Big Data and data-intensive applications, 
 which have been increasingly playing an important role in many fields such as 
 science, medical, military, finance, commerce, etc.
 
 Big Data is usually defined with ``three V'' corresponding to \textit{volume}, 
 \textit{velocity} and \textit{variety} ~\cite{de2016formal}.  
-For \textit{volume}, the vast amounts of data require scalable and distributed 
+\english{For \textit{volume}}, the vast amounts of data require scalable and distributed 
 approaches for storage solutions as well as querying of information and insights.  
-\textit{Velocity} emphasizes on the speed that data is generated from large data 
+\textit{Velocity} emphasizes on the speed \english{that} data is generated from large data 
 streams. Real-time analytics of streaming data requires immediate responses 
 from the data ingested by systems.
-\textit{variety} refers to the diversity of data types including both structured and 
+\textit{Variety} refers to the diversity of data types including both structured and 
 unstructured data such as text, audio, images, videos from various data sources.
 This data diversity requires not only elastic storage, transfer, processing but also 
 compute power to obtain deeper and valuable insights.  
@@ -37,7 +37,7 @@ and parallelism at micro as well as macro level to boost data processing.
 
 Data-intensive applications consist of complex long tasks and workflows 
 with a significant amount of data. 
-A modification can help to reduce the execution time by hours of even days. 
+\english{A modification can help to} reduce the execution time by hours of even days.
 It is thus crucial to quantify and optimize the performance of these applications 
 on HPC platforms. 
 However, these systems have heterogeneous and complex architectures since they 
@@ -55,7 +55,7 @@ resources consumption, power consumption, etc.
 
 Quantifying performance of the platforms basically relies on empirical methods, 
 which require running experiments on those platforms. 
-There are two common approaches to conduct experiments platforms, which are 
+There are two common approaches to conduct \english{experiments platforms}, which are 
 running real experiments on real platforms and using simulation tools. 
 In the first approach, real-world tasks, applications, workflows or pipelines are executed 
 directly on a real platform and the information about the performance of the system 
@@ -67,20 +67,20 @@ compute platforms face many difficulties.
 The first challenge is that platforms are normally shared with dynamics loads,
 the randomness in the status of the systems that hinder the reproducibility 
 of the experiment results.
-The next difficulty can be the labor-intensive experimental setups and 
+The next difficulty \english{can be} the labor-intensive experimental setups and 
 time-consuming applications, since experiments must be re-executed 
 multiple times with multiple settings. 
 Moreover, because real-platforms are not built for experimental purposes,
 users may not have the freedom to choose platform architectures, software and 
 system configurations since some settings may not be permitted and the 
 operational cost of the platforms are usually high. 
-These shortcomings apparently preclude the exploration of hypothetical scenarios.
+These shortcomings \english{apparently} preclude the exploration of hypothetical scenarios.
 
 Simulations address these concerns by providing simulation models and 
 abstractions for the performance of computer hardware, such as CPU, 
 network and storage. 
-The simulation models describe the interactions between simulated applications 
-and simulated platforms by evolving application activities (such as computation, 
+Simulation models describe the interactions between simulated applications 
+and simulated platforms by \english{evolving} application activities (such as computation, 
 data transfer) which consume simulated resources (CPU, network, storage) 
 throughout simulated application run time~\cite{casanova2014simgrid}. 
 As a result, simulations provide a cost-effective, fast, easy and reproducible 
@@ -112,7 +112,7 @@ the I/O bottleneck still exists.
 Caching is an ubiquitous technique to minimize data transfer from 
 low-speed storage by using a high-speed storage layer to store data 
 temporarily. Caching reuses previously accessed data for future requests, 
-so that it helps reducing data transfer times. 
+\english{so that it} helps reducing data transfer times. 
 Following the idea of caching, page cache is an architectural approach 
 implemented in Linux that leverages main memory to improve the 
 effectiveness in accessing data on disks, reduce filesystem data transfer times.
@@ -128,7 +128,7 @@ In case the amount of cache available is not sufficient for caching new data,
 data previously read or written to page cache can be flushed to disks or 
 evicted from cache with data flushing and cache eviction mechanisms. 
 These mechanisms are implemented in the Linux kernel and triggered 
-base on particular conditions of total amount of memory, the amount of data 
+\english{base on particular conditions of} total amount of memory, the amount of data 
 being written (i.e., dirty data), the amount of memory available for written data, 
 configurations and parameters defined in the kernel, etc.
 These parameters combined with the above mentioned flushing and eviction 
@@ -154,21 +154,21 @@ features, but are domain-specific.
 
 This thesis presents a page cache simulation model with important features 
 including data model representing cached data, data flushing mechanism and 
-cache eviction policy, which are not fully captured in most of other 
+cache eviction policy, which are not fully captured in most  other 
 simulation frameworks. 
-The thesis also presents the simulation algorithms of file read and file write, 
-which are in a chunk-by-chunk manner. 
-These functions play the role as the read and write functions in the kernel, 
+The thesis also presents simulation algorithms of file read and file write\english{, 
+which are} in a chunk-by-chunk manner. 
+These functions play the role of the read and write functions in the kernel, 
 simulate file read and file write by interacting with the simulated page cache.
-We also provide the implementation of the the page cache model, 
+We also provide the implementation of the page cache model, 
 file I/O algorithms in \wrench~\cite{casanova2020fgcs}, 
 a workflow simulation framework based on the popular 
 \simgrid distributed simulation toolkit~\cite{casanova2014simgrid}. 
-In order to validate, evaluate the accuracy and scalability of the page cache 
+In order to validate and evaluate the accuracy and scalability of the page cache 
 simulation model, we implement a simulator in pure Python as well as 
 in C with \wrench framework and compare it to a simulator with the original 
 WRENCH version, which is not integrated the page cache model. 
-The simulator is evaluated in different experiments, which are common 
+The simulator is evaluated in different experiments\english{, which are} common 
 scenarios in data-intensive applications on HPC.
 The experiments range from single-threaded, multi-threaded applications, 
 remote storage application using synthetic data, as well as a real neuroimaging 
@@ -178,22 +178,22 @@ the simulation accuracy by reducing the relative simulation errors by up to 9 ti
 though there are some limitations in the current version of \simgrid framework. 
 In addition, our simulator not only achieves more accurate simulation results 
 but also simulates correctly the behaviors of the page cache, proves the correctness 
-of the model and opens the opportunities to be further enhanced. 
+of the model and \english{opens the opportunities to be further enhanced.} 
 
 \section{Thesis organization}
 
 This thesis consists of five main parts divided into chapters.
 Chapter~\ref{relatedwork} provides the background knowledge of Linux page cache 
 with key features and mechanisms. 
-It also summarizes the simulation approach in studies in HPC performance with 
+It also summarizes the simulation approach \english{in studies in HPC performance} with 
 existing simulation frameworks and models. 
 The reasons for the choice of simulation tools is this thesis are explained in this 
 chapter as well.
 Chapter~\ref{method} presents the page cache simulation model with the key features 
 in three main sections.
 The first section describes simulation of the page cache components including data 
-presentation, page cache LRU lists and, flushing and eviction mechanisms.
-The second section interprets the algorithms simulating file read and write which work 
+presentation \TG{not sure what this is}, page cache LRU lists and, flushing and eviction mechanisms.
+The second section interprets the algorithms simulating file read and write \english{which work}
 in a chunk-by-chunk style.
 The last section in this chapter briefly presents the implementation plan to integrate 
 the page cache model into WRENCH framework.
