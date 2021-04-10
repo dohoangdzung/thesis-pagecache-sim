@@ -1,6 +1,26 @@
 \chapter{Methods}
 \label{method}
 
+\TG{This chapter should have a more informative title, maybe ``Page cache simulation model''.}
+
+\TG{Add a line of intro: ``This chapter describes our page cache simulation model and its implementation in the WRENCH framework.''}
+
+\TG{The following comments from Review 1 should be taken into account (here and in the paper repo):
+
+\begin{itemize}
+\item In Algorithm 2 and 3, the function mm.evict has different calling parameters. What is the difference between these of overloaded methods?
+
+\item Most of the functions called in Algorithm 2 and 3 have same functionality
+as presented in the manuscript description of these algorithms but either
+the function names or the order of parameters did not match in these two
+algorithms. Consistency of the manuscript is key of good presentation.
+
+\item 
+Also, it would be easy to understand if the authors provide a diagram which
+shows the modifications at the WRENCH design or workflow.
+\end{itemize}
+}
+
 We separate our simulation model in two components, the I/O
 Controller and the Memory Manager, which together simulate
 file reads and writes (Figure~\ref{fig:interaction}).
