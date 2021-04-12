@@ -11,13 +11,13 @@ and a copy of the chunk in cache (line 9).
 If there is not enough available memory, the Memory Manager is called
 to flush dirty data (line 10). If necessary, flushing is complemented by
 eviction (line 11). Note that, when called with negative arguments, functions
-\texttt{flush} and \texttt{evict} simply return and do not do anything. Then,
-if the block requires
-uncached data, the memory manager is called to read data from disk and to add this
-data to cache (line 14).
+\texttt{flush} and \texttt{evict} simply return and do not do anything. 
+Then,if the block requires uncached data, the memory manager is called 
+to read data from disk and to add this data to cache (line 14).
 If cached data needs to be read, the Memory Manager is called to simulate
 a cache read  and update the corresponding data blocks accordingly (line 17).
-Finally, the memory manager is called to deallocate the amount of anonymous memory used by the application (line 19).
+Finally, the memory manager is called to deallocate the amount of anonymous 
+memory used by the application (line 19).
 
 \begin{algorithm}[H]
 \caption{File chunk read simulation in I/O Controller}
@@ -34,8 +34,8 @@ Finally, the memory manager is called to deallocate the amount of anonymous memo
            \State disk\_read = min(cs, fs - mm.cached(fn)) \Comment{To be read from disk}
            \State cache\_read = cs - disk\_read \Comment{To be read from cache}
            \State required\_mem = cs + disk\_read
-           \State mm.flush(required\_mem - mm.free\_mem - mm.evictable, fn)
-           \State mm.evict(required\_mem - mm.free\_mem, fn)
+           \State mm.flush(required\_mem - mm.free\_mem - mm.evictable)
+           \State mm.evict(required\_mem - mm.free\_mem)
            \If {disk\_read $>$ 0}  \Comment{Read uncached data}
            \State sm.read(disk\_read)
            \State mm.add\_to\_cache(disk\_read, fn)
@@ -75,14 +75,14 @@ where we repeatedly flush and evict from the cache (line 12-18).
         \If {remain\_dirty $>$ 0} \Comment{Write to memory}
             \State mm.evict(min(cs, remain\_dirty) - mm.free\_mem)
             \State mem\_amt = min(cs, mm.free\_mem)
-            \State mm.write\_to\_cache(fn, mem\_amt)
+            \State mm.write\_to\_cache( mem\_amt, fn)
         \EndIf
         \State remaining = cs - mem\_amt
         \While {remaining $>$ 0}  \Comment{Flush to disk, then write to cache}
             \State mm.flush(cs - mem\_amt)
             \State mm.evict(cs - mem\_amt  - mm.free\_mem)
             \State to\_cache = min(remaining, mm.free\_mem)
-            \State mm.write\_to\_cache(fn, to\_cache)
+            \State mm.write\_to\_cache(to\_cache, fn)
             \State remaining = remaining - to\_cache
         \EndWhile
 
