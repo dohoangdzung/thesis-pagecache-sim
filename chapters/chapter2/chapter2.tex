@@ -3,9 +3,8 @@
 
 This chapter provides background knowledge regarding the Linux page cache, 
 which is the center of this thesis. 
-It also discusses the needs in quantifying performance of computing platforms 
-and the current approaches, which are real platform experiments, 
-emulation and simulation.
+It also discusses the current approaches to measure performance in computing platforms: real platform experiments, 
+emulation, and simulation.
 Next, the chapter summarizes the context of existing simulation tools, their 
 advantages as well as challenges, and the existing simulation of page cache in the 
 existing simulators. 
@@ -16,9 +15,9 @@ their benefits and the reasons why we chose them to implement out model.
 
 This section discusses the concept of the page cache and how page cache 
 helps reducing I/O costs.
-It also introduces the mechanisms of the page cache, which are implemented 
-in the Linux kernel, including cache eviction policies, dirty data, the flushing 
-mechanisms, which flushes dirty data from the page cache to disk. 
+It also introduces the mechanisms of the page cache as implemented 
+in the Linux kernel, including cache eviction policies, dirty data, and flushing 
+mechanisms that flush dirty data from the page cache to disk. 
 
 \subsection{Page cache reduces I/O cost}
 
@@ -41,7 +40,7 @@ The size of the page cache is dynamic as it can grow when there is
 available free memory, and can be shrunk to release memory if needed. 
 Data cached in the page cache consists of pages, which means files 
 do not need to be cached entirely, the page cache can keep the whole file, 
-or only part of file. 
+or only part of the file. 
 
 When the kernel starts a read operation, it checks if the required data is 
 in memory. If yes, called a \textit{cache hit}, data is then read directly 
@@ -60,7 +59,7 @@ Generally speaking, the page cache can implement one in three
 different write strategies.
 
 In the first strategy, which is \textit{no-write}, the page cache simply 
-does not involve in write operations. In \textit{no-write}, data is written 
+is not involved in write operations. In \textit{no-write}, data is written 
 directly to disk, the cache is invalidated and data is read from disk for any 
 subsequent requests. 
 This strategy is rarely implemented since it not only fails to cache data, 
@@ -87,8 +86,8 @@ and can be removed from page cache when the free memory is insufficient.
 The writeback strategy is considered to outperform writethrough as well as
 direct I/O (page cache bypassed for I/O) as it delays disk writes to perform 
 a bulk write at a later time \cite{linuxdev3rd2010}. 
-However, this strategy requires more complex implementation as well as  
-more computation overhead. 
+However, this strategy requires more complex implementations as well as  
+more computational overhead. 
 
 \subsubsection{Caching on network file systems}
 
@@ -106,9 +105,9 @@ client, it will be read from the server. On the server side, the kernel also che
 for the availability of data in server cache to decide whether data is read from 
 cache or disk. 
 
-In write operations, however, the server cache does not involve since the data 
+In write operations, however, the server cache is not involved since the data 
 written to NFS server must not be cached on the server side but must be written 
-to disk before the write call on the client finishes to ensure data integrity. 
+to disk before the write call on the client finishes to ensure data integrity \TG{revise this sentence, it's long and unclear.}. 
 If server cache is enabled for writing, a server crash during a cache 
 write will result in a problem that the client could not be aware of whether 
 data has been written successfully. 
@@ -122,7 +121,7 @@ network filesystems.
 
 The cache eviction mechanism is one of the key features of the
 page cache. 
-It is responsible for deciding which pages to be removed from the 
+It is responsible for deciding which pages are removed from the 
 page cache to make memory space available for new entries as well as 
 free memory for other uses. 
 Whenever free memory becomes insufficient, either as a result of application 
@@ -137,10 +136,7 @@ to evict. As in the concept of the page cache, data that is more likely
 to be accessed in the future should be kept in the page cache, and the data 
 that is least likely to be used should be evicted. 
 
-We have mentioned the page cache, how the pages are added to the page cache, 
-and cache eviction. But we did not discuss how the page cache is exactly structured, 
-and how data is placed and removed from the page cache?
-Indeed, there are different cache eviction algorithms that have been 
+Different cache eviction algorithms have been 
 proposed in order to maximize the effect of the cache as well as to 
 ease the implementation overhead \cite{chavan2011comparison}.
 In the next section, we will provide a brief summary of some of the popular 
@@ -156,7 +152,7 @@ Many algorithms have been designed and proposed to approximate the
 
 One of the most commonly used strategies is \textit{Least Recently Used (LRU)}. 
 This page replacement policy is based on the principle of locality which assumes    
-that data references of a process tend to cluster. 
+that data references of a process tend to cluster in time. 
 Thus, it selects pages that have not been referred for the longest time to remove 
 \cite{chavan2011comparison}. However, one of the drawbacks of LRU 
 is not considering data access frequency.
@@ -359,11 +355,11 @@ components: (i) simulation models; (ii) platform specification;
 and (iii) application specification.
 \textit{Simulation models} are the abstraction interactions between computer 
 resources (e.g. CPU, network, disks) and application activities throughout 
-application execution time. 
+application execution time \TG{Revise, I don't think that simulation models are ``abstraction interactions''}. 
 These models estimate the completion time of application activities 
 that consume resources and evolve the simulated execution time accordingly.
 \textit{Platform specification} describes the structure (e.g number of hosts, 
-networkconnections between hosts) of platforms with hardware properties 
+network connections between hosts) of platforms with hardware properties 
 (e.g. CPU speed, disk capacity, network bandwidth).
 \textit{Application specification} describes sets of activities, their order 
 and relation in simulated applications.
@@ -375,10 +371,10 @@ a solution with fast simulation.
 Thus, users can re-execute experiments in a short time at low costs.
 Furthermore, as the platform simulation resource simulation models 
 are decoupled from each other and from applications, users have 
-the freedom to choose their experimental platforms, which enables the 
-insights that are difficult to reveal with real-world platforms. 
+the freedom to choose their experimental platforms, which provides
+insights that remain out of reach in real-world platforms. 
 Specifically, simulation results are consistent and reproducible since 
-platforms are initiated with detailed specifications. 
+platforms are created with detailed specifications. 
 As a result, this approach has been widely adopted in scientific studies
 in computer science. 
 Nonetheless, there are still two main concerns for simulation, which 
@@ -427,12 +423,12 @@ The simulation models and abstractions are implemented in simulators
 in order to study the functional and performance behaviors of application 
 workloads executed on various hardware/software infrastructures. 
 Models for resources such as compute, network, disk have been proposed, 
-ranging from simple mathematical equations, analytical models 
+ranging from simple mathematical equations  
 to complex processes.
 For example, to simulate a file read from disk, a simple mathematical model 
 can estimate read time as file size divided by disk bandwidth, 
 while a more complex, discrete-event model simulates detailed events 
-such as disk seeks, read buffer, etc to fulfill the read request.
+such as disk seeks or buffer reads to fulfill the read request.
 
 The two main concerns for simulation are accuracy, the ability to 
 faithfully reproduce real-world executions, and scalability, 
@@ -509,7 +505,7 @@ in most simulation frameworks.
 Throughout the years, simulators developed and used by researchers in 
 parallel and distributed computing are often domain-specific 
 \cite{casanova2014simgrid}.
-As discussed in the Section~\ref{sec:simmodel}, there is always a trade-off 
+As discussed in Section~\ref{sec:simmodel}, there is always a trade-off 
 between simulation accuracy and scalability in the simulation frameworks due 
 to the models used in those tools. 
 \simgrid is a versatile simulation framework for HPC cluster, cloud and 
