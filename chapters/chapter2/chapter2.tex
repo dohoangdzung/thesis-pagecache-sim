@@ -105,9 +105,9 @@ client, it will be read from the server. On the server side, the kernel also che
 for the availability of data in server cache to decide whether data is read from 
 cache or disk. 
 
-In write operations, however, the server cache is not involved since the data 
-written to NFS server must not be cached on the server side but must be written 
-to disk before the write call on the client finishes to ensure data integrity \TG{revise this sentence, it's long and unclear.}. 
+However, the server cache is not involved in writing since the data 
+written to NFS server should not be cached on the server side. 
+Instead, data must be written directly to disk to ensure data integrity.
 If server cache is enabled for writing, a server crash during a cache 
 write will result in a problem that the client could not be aware of whether 
 data has been written successfully. 
@@ -353,9 +353,9 @@ largely used in some areas of computer science \cite{casanova2008simgrid}.
 Simulation frameworks usually share the same design with three main 
 components: (i) simulation models; (ii) platform specification; 
 and (iii) application specification.
-\textit{Simulation models} are the abstraction interactions between computer 
+\textit{Simulation models} simulates interactions between computer 
 resources (e.g. CPU, network, disks) and application activities throughout 
-application execution time \TG{Revise, I don't think that simulation models are ``abstraction interactions''}. 
+application execution time. 
 These models estimate the completion time of application activities 
 that consume resources and evolve the simulated execution time accordingly.
 \textit{Platform specification} describes the structure (e.g number of hosts, 
