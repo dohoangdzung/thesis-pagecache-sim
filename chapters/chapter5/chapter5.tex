@@ -28,11 +28,18 @@ specific hardware architectures~\cite{hayot2020performance}.
 Not all I/O behaviors are captured by currently available simulation models,
 including the one developed in this work, 
 which could substantially limit the accuracy of simulations.
+Deeper investigation in cache eviction and data flushing mechanisms 
+could help improve the accuracy of the model. 
 Relevant extensions to this work include more
 accurate descriptions of anonymous memory usage in applications, 
-which strongly affects I/O times through writeback cache. File access patterns
- might also be worth including in the simulation models,
+which strongly affects I/O times through writeback cache. 
+File access patterns might also be worth including in the simulation models,
 as they directly affect page cache content.
+Apart from local and network filesystems considered in this work, 
+simulating page cache with Lustre filesystem would also be a possible 
+extension of the model. 
+Another interesting challenge should be simulating big data applications 
+on big data frameworks such as Spark or Hadoop.
 % readahead and persistent storage could also be adeed
 % Simulation results could be made even more accurate by a deeper
 % investigation of page cache flushing and eviction order. 
